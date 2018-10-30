@@ -404,7 +404,13 @@
 
         function UpdateRecognizedPhrase(json) {
             hypothesisDiv.innerHTML = "";
-            phraseDiv.innerHTML += json + "\n";
+            let objJson = JSON.parse(json); //Parse json string into json object
+            let displayText = objJson.DisplayText;
+
+            //Check if the displayText is not undefined
+            if (displayText) {
+                phraseDiv.innerHTML += displayText + "\n";
+            }
         }
 
         function OnComplete() {
