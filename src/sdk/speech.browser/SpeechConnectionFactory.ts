@@ -39,7 +39,7 @@ export class SpeechConnectionFactory implements IConnectionFactory {
         }
 
         const queryParams: IStringDictionary<string> = {
-            cid: "32b8bdd1-5ad2-4c7d-8f12-28f3890a76b3", // Added param for custom speech endpoint
+            cid: "", // CID_CUSTOM_SPEECH_ENDPOINT
             format: SpeechResultFormat[config.Format].toString().toLowerCase(),
             language: config.Language,
         };
@@ -56,7 +56,7 @@ export class SpeechConnectionFactory implements IConnectionFactory {
     }
 
     // public host: string = "wss://speech.platform.bing.com";
-    public host: string = "wss://westus.stt.speech.microsoft.com"; // Host for custom speech endpoint
+    public host: string = ""; // HOST_CUSTOM_SPEECH_ENDPOINT
 
     private get Host(): string {
         return Storage.Local.GetOrAdd("Host", this.host);
