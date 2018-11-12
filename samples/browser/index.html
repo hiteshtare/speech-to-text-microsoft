@@ -481,24 +481,8 @@
             startBtn.disabled = false;
             stopBtn.disabled = true;
 
-            // phraseDiv.innerHTML =
-            //     `Hi Doctor John, good evening, how are you?
-            // I am good, I don’t have much time.
-            // I wanted to let you know that Plavix now comes with new strength 75 mg
-            // Is there any side effects other than the usual I need to be aware about ?
-            //     It’s the usual
-            // Can you provide the details of any efficacy study against Xarelto ? Please drop it with my receptionist.I will get back to you next week if I have any questions.
-            //     Okay.Thanks.Good day`;
-
-            //             phraseDiv.innerHTML =
-            //                 `Hi Doctor Alex, Good afternoon, how are you?
-            // Good thank you. Were you able to send me the patient advise information for Eloxatin?
-            // Yes doctor, I sent it 2 days ago on your email id.
-            // Do you have a copy of it now? My next appointment is with the patient’s care taker who is on Eloxatin.
-            // Sure. Here you go. Additionally, you can also refer them to this patient awareness program we have started for all care
-            // givers or patients with colon cancer.
-            // That helps. Thank you.
-            // let me know if you need any more info. I will see you again next month.`;
+            phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+            and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
             if (phraseDiv.innerHTML) {
                 extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
@@ -531,6 +515,7 @@
                 console.log(`token.entities.length`);
                 console.log(token.entities.length);
                 if (token.entities.length > 0) {
+                    /*############################PRODUCT############################*/
                     var objProducts = findObjectByKey(token.entities, "type", "brand");
                     objProducts.forEach((objProduct,index) => {
                         productName = objProduct.entity;
@@ -541,12 +526,13 @@
                         {
                             document.getElementById("productName").innerHTML += "<i>score : " +   score + "</i>" + "\n";
                         }
-                        productName_cap = capitalizeFirstLetter(productName);
-                        highlightTextInsideDiv(productName_cap);
+                        highlightTextInsideDiv(productName);
                         document.getElementById("productName").innerHTML += productName + "\n";
                         document.getElementById('product').style.display = 'block';
                     });
-
+                    /*############################PRODUCT############################*/
+                    
+                    /*#########################KEY MESSAGES#########################*/
                     var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
                     objKeyMessages.forEach((objKeyMessage,index) => {
                         keyMessages = objKeyMessage.entity;
@@ -561,13 +547,15 @@
                         document.getElementById("keywords").innerHTML += keyMessages + "\n";
                         document.getElementById('keywordsM').style.display = 'block';
                     });
-
-
+                    /*#########################KEY MESSAGES#########################*/
+                    
+                    /*##########################FOLLOW UPS##########################*/
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
                     objFollowUps.forEach((objFollowUp) => {
                         followup = objFollowUp.entity;
                         console.log(`followup : datetime`);
                         console.log(objFollowUp);
+                        highlightTextInsideDiv(followup);
                         document.getElementById("followup").innerHTML += followup + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
@@ -576,6 +564,7 @@
                         followup = objFollowUp.entity;
                         console.log(`followup : daterange`);
                         console.log(objFollowUp);
+                        highlightTextInsideDiv(followup);
                         document.getElementById("followup").innerHTML += followup + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
@@ -584,10 +573,11 @@
                         followup = objFollowUp.entity;
                         console.log(`followup : date`);
                         console.log(objFollowUp);
+                        highlightTextInsideDiv(followup);
                         document.getElementById("followup").innerHTML += followup + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
-
+                    /*##########################FOLLOW UPS##########################*/
                 } else {
                     document.getElementById("product").style.display = "none";
                     document.getElementById('keywordsM').style.display = 'none';
@@ -607,19 +597,25 @@
             return ArrobjectByKey;
         }
 
+        // To highlight text inside the specified div using particular color 
         function highlightTextInsideDiv(text) {
             var inputText = document.getElementById("phraseDiv");
             var innerHTML = inputText.innerHTML;
-            var index = innerHTML.indexOf(text);
+            var index = innerHTML.indexOf(text); //For Lowercase only
                
             if (index >= 0) { 
                 innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
                 inputText.innerHTML = innerHTML;
-                }
-        }
+            }
+            else { //For Camelcase i.e First Character is in Upper Case
+                var capitalizeFirstLetter = text.charAt(0).toUpperCase() + text.slice(1);
+                var newIndex = innerHTML.indexOf(capitalizeFirstLetter);
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
+              if (newIndex >= 0) { 
+                innerHTML = innerHTML.substring(0,newIndex) + "<span class='highlight'>" + innerHTML.substring(newIndex,newIndex+capitalizeFirstLetter.length) + "</span>" + innerHTML.substring(newIndex + capitalizeFirstLetter.length);
+                inputText.innerHTML = innerHTML;
+                }
+            }
         }
     </script>
 </body>
