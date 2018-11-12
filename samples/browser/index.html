@@ -17,6 +17,10 @@
             color: #666666 !important;
             cursor: not-allowed;
         }
+
+        .highlight {
+  background-color: aqua;
+}
     </style>
 </head>
 
@@ -87,7 +91,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <textarea id="phraseDiv" style="display: inline-block;width:350px;height:200px"></textarea>
+                                            <div id="phraseDiv" style="display: inline-block;width:350px;height:200px"></div>
                                         </td>
                                     </tr>
                                     <tr>
@@ -528,19 +532,32 @@
                 console.log(token.entities.length);
                 if (token.entities.length > 0) {
                     var objProducts = findObjectByKey(token.entities, "type", "brand");
-                    objProducts.forEach((objProduct) => {
-                        productName = objProduct.entity
+                    objProducts.forEach((objProduct,index) => {
+                        productName = objProduct.entity;
+                        score = objProduct.score;
                         console.log(`objProduct`);
                         console.log(objProduct);
+                        if(index ===0)
+                        {
+                            document.getElementById("productName").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+                        }
+                        productName_cap = capitalizeFirstLetter(productName);
+                        highlightTextInsideDiv(productName_cap);
                         document.getElementById("productName").innerHTML += productName + "\n";
                         document.getElementById('product').style.display = 'block';
                     });
 
                     var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
-                    objKeyMessages.forEach((objKeyMessage) => {
+                    objKeyMessages.forEach((objKeyMessage,index) => {
                         keyMessages = objKeyMessage.entity;
+                        score = objKeyMessage.score;
                         console.log(`objKeyMessage`);
                         console.log(objKeyMessage);
+                        if(index ===0)
+                        {
+                            document.getElementById("keywords").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+                        }
+                        highlightTextInsideDiv(keyMessages);
                         document.getElementById("keywords").innerHTML += keyMessages + "\n";
                         document.getElementById('keywordsM').style.display = 'block';
                     });
@@ -588,6 +605,21 @@
                 }
             }
             return ArrobjectByKey;
+        }
+
+        function highlightTextInsideDiv(text) {
+            var inputText = document.getElementById("phraseDiv");
+            var innerHTML = inputText.innerHTML;
+            var index = innerHTML.indexOf(text);
+               
+            if (index >= 0) { 
+                innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+                inputText.innerHTML = innerHTML;
+                }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
     </script>
 </body>
