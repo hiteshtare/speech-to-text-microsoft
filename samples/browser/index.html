@@ -481,13 +481,15 @@
             startBtn.disabled = false;
             stopBtn.disabled = true;
 
-            phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-            and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+            // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+            // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
             if (phraseDiv.innerHTML) {
                 extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
             }
         }
+
+        var objJSON = {};
 
         //Intent/Entity Extraction using LUIS
         function extractInLUIS(phrase) {
@@ -515,10 +517,15 @@
                 console.log(`token.entities.length`);
                 console.log(token.entities.length);
                 if (token.entities.length > 0) {
+                    objJSON['Products'] = [];
+                    objJSON['KeyMessages'] = [];
+                    objJSON['FollowUps'] = [];
+                    
                     /*############################PRODUCT############################*/
                     var objProducts = findObjectByKey(token.entities, "type", "brand");
                     objProducts.forEach((objProduct,index) => {
                         productName = objProduct.entity;
+                        objJSON['Products'].push(productName);
                         score = objProduct.score;
                         console.log(`objProduct`);
                         console.log(objProduct);
@@ -536,6 +543,7 @@
                     var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
                     objKeyMessages.forEach((objKeyMessage,index) => {
                         keyMessages = objKeyMessage.entity;
+                        objJSON['KeyMessages'].push(keyMessages);
                         score = objKeyMessage.score;
                         console.log(`objKeyMessage`);
                         console.log(objKeyMessage);
@@ -553,6 +561,7 @@
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
                     objFollowUps.forEach((objFollowUp) => {
                         followup = objFollowUp.entity;
+                        objJSON['FollowUps'].push(followup);
                         console.log(`followup : datetime`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
@@ -562,6 +571,7 @@
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
                     objFollowUps.forEach((objFollowUp) => {
                         followup = objFollowUp.entity;
+                        objJSON['FollowUps'].push(followup);
                         console.log(`followup : daterange`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
@@ -571,6 +581,7 @@
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
                     objFollowUps.forEach((objFollowUp) => {
                         followup = objFollowUp.entity;
+                        objJSON['FollowUps'].push(followup);
                         console.log(`followup : date`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
@@ -578,7 +589,10 @@
                         document.getElementById('followupM').style.display = 'block';
                     });
                     /*##########################FOLLOW UPS##########################*/
-                } else {
+                } 
+                else {
+                    objJSON = {};
+
                     document.getElementById("product").style.display = "none";
                     document.getElementById('keywordsM').style.display = 'none';
                     document.getElementById('followupM').style.display = 'none';
