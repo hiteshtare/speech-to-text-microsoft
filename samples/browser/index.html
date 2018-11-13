@@ -22,6 +22,7 @@
   background-color: aqua;
 }
 
+/********************************** OVERLAY *********************************/
 #overlay {
      visibility: hidden;
      position: absolute;
@@ -40,13 +41,12 @@
      border:1px solid #000;
      padding:15px;
      text-align:center;
-     background-color: gainsboro;
+     background-color: #fbcf80;
      left: 40%;
      position: fixed;
 }
 
-
-#changes {
+/* #changes {
      visibility: hidden;
      position: absolute;
      left: 0px;
@@ -68,7 +68,9 @@
      top: 25%;
      left: 40%;
      position: fixed;
-}
+} */
+/********************************** OVERLAY *********************************/
+
     </style>
 </head>
 
@@ -79,7 +81,7 @@
     </div>
     <div class="container">
         <div class="row grid-divider" style="border-style: solid;border-color:#efeff4">
-            <div class="col-sm-3 col-md-6 col-lg-4" style="background-color:#f7f7f7;height:100vh;">
+            <div class="col-sm-3 col-md-6 col-lg-5" style="background-color:#f7f7f7;height:100vh;">
                 <div class="col-padding">
                     <div id="header">
                         <div class="row" style="background-color:#7ab033;height: 54px;">
@@ -152,14 +154,14 @@
                                             <div class=" col-padding">
                                                 <!-- <img src="right.png" style=" height: 102vh; width: 100vh;"> -->
                                                 <div class="row" style="padding-top:5px;">
-                                                    <div class="col-sm-12" id="product" style="display:none;"><b>Product</b>
+                                                    <div class="col-sm-12" id="product" style="display:none;"><b>Products</b>
                                                         <pre id="productName"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
                                                     <!-- <div class="col-sm-6" ><button onclick="func()">CLICK ME</button></div> -->
                                                 </div>
                                                 <div class="row" style="padding-top:5px;">
-                                                    <div class="col-sm-12" id="keywordsM" style="display:none;"><b>keyMessages</b>
+                                                    <div class="col-sm-12" id="keywordsM" style="display:none;"><b>Key Messages</b>
                                                         <pre id="keywords"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -167,7 +169,7 @@
                                                 </div>
                                                 <div class="row" style="padding-top:5px;">
                                                     <div class="col-sm-12" id="followupM" style="display:none;"><b>Follow
-                                                            Up</b>
+                                                            Ups</b>
                                                         <pre id="followup"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -208,7 +210,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-9 col-md-6 col-lg-8" style="height:100vh;background:url('right.png');">
+            <div class="col-sm-9 col-md-6 col-lg-7" style="height:100vh;background:url('right.png');">
                 <!-- <div class="col-sm-9 col-md-6 col-lg-8" style="height:100vh;"> -->
                 <div class=" col-padding">
                     <!-- <table>
@@ -234,20 +236,22 @@
     <div id="overlay">
         <div>
         <h4>Edit Popup</h4>
+        Current Value : <pre id="change"></pre>
+        <br>
              <p><input type="text" id="result" name="result" value=""></p>
              <br>
              <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
         </div>
    </div>
 
-   <div id="changes">
+   <!-- <div id="changes">
         <div>
         <h4>Changed Value</h4>
              <pre id="change"></pre>
              <br>
              <button type="button" onclick="hideChange()">Hide</button>
         </div>
-   </div>
+   </div> -->
 
     <!-- SDK REFERENCE -->
     <script src="../../distrib/speech.sdk.bundle.js"></script>
@@ -591,7 +595,7 @@ var id = '';
                     objJSON['KeyMessages'] = [];
                     objJSON['FollowUps'] = [];
 
-                    var buttonOK = `<button type="button">OK</button> | `;
+                    var buttonOK = `Approval: <input type="radio" name="approve" value="yes" checked> Yes  <input type="radio" name="approve" value="no"> No | `;
                 
                     /*############################PRODUCT############################*/
                     var objProducts = findObjectByKey(token.entities, "type", "brand");
@@ -610,9 +614,9 @@ var id = '';
 
                         var productId = objJSON['Products'].length - 1;
                         var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('Products',${productId})">Edit</button>`;
-                        var buttonSHOW_PRODUCT = `| <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
+                        var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
 
-                        document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT + buttonSHOW_PRODUCT + "\n";
+                        document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT  + "\n";
                         document.getElementById('product').style.display = 'block';
                     });
                     /*############################PRODUCT############################*/
@@ -633,9 +637,9 @@ var id = '';
 
                         var productId = objJSON['KeyMessages'].length - 1;
                         var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('KeyMessages',${productId})">Edit</button>`;
-                        var buttonSHOW_KEYMESSAGE = `| <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
+                        var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
 
-                        document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK +  buttonEDIT_KEYMESSAGE + buttonSHOW_KEYMESSAGE  + "\n";
+                        document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK +  buttonEDIT_KEYMESSAGE + "\n";
                         document.getElementById('keywordsM').style.display = 'block';
                     });
                     /*#########################KEY MESSAGES#########################*/
@@ -651,9 +655,9 @@ var id = '';
 
                          var productId = objJSON['FollowUps'].length - 1;
                         var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                        var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                        document.getElementById("followup").innerHTML +=  "\t" + buttonOK +  buttonEDIT_FOLLOWUP + buttonSHOW_FOLLOWUP + "<br />";
+                        document.getElementById("followup").innerHTML +=  "\t" + buttonOK +  buttonEDIT_FOLLOWUP + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
@@ -666,9 +670,9 @@ var id = '';
 
                        var productId = objJSON['FollowUps'].length - 1;
                         var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                        var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                        document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + buttonSHOW_FOLLOWUP + "<br />";
+                        document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
@@ -681,9 +685,9 @@ var id = '';
 
                          var productId = objJSON['FollowUps'].length - 1;
                         var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                        var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                         document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + buttonSHOW_FOLLOWUP + "<br />";
+                         document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
                        document.getElementById('followupM').style.display = 'block';
                     });
                     /*##########################FOLLOW UPS##########################*/
@@ -732,7 +736,7 @@ var id = '';
 
 
     function openPopup(a_type,a_id) {
-        hideChange();
+        //hideChange();
 
         type = a_type;
         id = a_id;
@@ -743,7 +747,7 @@ var id = '';
         var input = document.getElementById("result");
         input.value = objJSON[type][id];
 
-
+        document.getElementById("change").innerHTML = objJSON[type][id];
     }
 
      function closePopup() {    
@@ -762,29 +766,30 @@ var id = '';
             var input = document.getElementById("result");
             objJSON[type][id] = input.value;
 
-            closePopup();
+            document.getElementById("change").innerHTML = objJSON[type][id];
+            //closePopup();
         }
     }
 
-    function showChange(a_type,a_id) {
-        closePopup();
+    // function showChange(a_type,a_id) {
+    //     closePopup();
 
-        type = a_type;
-        id = a_id;
+    //     type = a_type;
+    //     id = a_id;
 
-        el = document.getElementById("changes");
-        el.style.visibility =  "visible";
+    //     el = document.getElementById("changes");
+    //     el.style.visibility =  "visible";
 
-        document.getElementById("change").innerHTML = objJSON[type][id];
-    }
+    //     document.getElementById("change").innerHTML = objJSON[type][id];
+    // }
 
-    function hideChange() {    
-        type = '';
-        id = '';
+    // function hideChange() {    
+    //     type = '';
+    //     id = '';
 
-        el = document.getElementById("changes");
-        el.style.visibility =  "hidden";
-    }
+    //     el = document.getElementById("changes");
+    //     el.style.visibility =  "hidden";
+    // }
 
 
     </script>
