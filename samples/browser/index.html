@@ -21,6 +21,54 @@
         .highlight {
   background-color: aqua;
 }
+
+#overlay {
+     visibility: hidden;
+     position: absolute;
+     left: 0px;
+     top: 0px;
+     width:100%;
+     height:100%;
+     text-align:center;
+     z-index: 1000;
+}
+
+#overlay div {
+     width:300px;
+     margin: 100px auto;
+     background-color: #fff;
+     border:1px solid #000;
+     padding:15px;
+     text-align:center;
+     background-color: gainsboro;
+     left: 40%;
+     position: fixed;
+}
+
+
+#changes {
+     visibility: hidden;
+     position: absolute;
+     left: 0px;
+     top: 0px;
+     width:100%;
+     height:100%;
+     text-align:center;
+     z-index: 1000;
+}
+
+#changes div {
+     width:300px;
+     margin: 100px auto;
+     background-color: #fff;
+     border:1px solid #000;
+     padding:15px;
+     text-align:center;
+     background-color:#fbcf80;
+     top: 25%;
+     left: 40%;
+     position: fixed;
+}
     </style>
 </head>
 
@@ -182,6 +230,25 @@
         </div>
     </div>
 
+
+    <div id="overlay">
+        <div>
+        <h4>Edit Popup</h4>
+             <p><input type="text" id="result" name="result" value=""></p>
+             <br>
+             <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
+        </div>
+   </div>
+
+   <div id="changes">
+        <div>
+        <h4>Changed Value</h4>
+             <pre id="change"></pre>
+             <br>
+             <button type="button" onclick="hideChange()">Hide</button>
+        </div>
+   </div>
+
     <!-- SDK REFERENCE -->
     <script src="../../distrib/speech.sdk.bundle.js"></script>
 
@@ -337,6 +404,9 @@
         var formatOptions_value = 'Simple';
         var recognitionMode_value = 'Conversation';
         var inputSource_value = 'Mic';
+
+var type = '';
+var id = '';
 
         document.addEventListener("DOMContentLoaded", function () {
             createBtn = document.getElementById("createBtn");
@@ -520,7 +590,9 @@
                     objJSON['Products'] = [];
                     objJSON['KeyMessages'] = [];
                     objJSON['FollowUps'] = [];
-                    
+
+                    var buttonOK = `<button type="button">OK</button> | `;
+                
                     /*############################PRODUCT############################*/
                     var objProducts = findObjectByKey(token.entities, "type", "brand");
                     objProducts.forEach((objProduct,index) => {
@@ -529,12 +601,18 @@
                         score = objProduct.score;
                         console.log(`objProduct`);
                         console.log(objProduct);
+                       
                         if(index ===0)
                         {
                             document.getElementById("productName").innerHTML += "<i>score : " +   score + "</i>" + "\n";
                         }
                         highlightTextInsideDiv(productName);
-                        document.getElementById("productName").innerHTML += productName + "\n";
+
+                        var productId = objJSON['Products'].length - 1;
+                        var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('Products',${productId})">Edit</button>`;
+                        var buttonSHOW_PRODUCT = `| <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
+
+                        document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT + buttonSHOW_PRODUCT + "\n";
                         document.getElementById('product').style.display = 'block';
                     });
                     /*############################PRODUCT############################*/
@@ -552,7 +630,12 @@
                             document.getElementById("keywords").innerHTML += "<i>score : " +   score + "</i>" + "\n";
                         }
                         highlightTextInsideDiv(keyMessages);
-                        document.getElementById("keywords").innerHTML += keyMessages + "\n";
+
+                        var productId = objJSON['KeyMessages'].length - 1;
+                        var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('KeyMessages',${productId})">Edit</button>`;
+                        var buttonSHOW_KEYMESSAGE = `| <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
+
+                        document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK +  buttonEDIT_KEYMESSAGE + buttonSHOW_KEYMESSAGE  + "\n";
                         document.getElementById('keywordsM').style.display = 'block';
                     });
                     /*#########################KEY MESSAGES#########################*/
@@ -565,7 +648,12 @@
                         console.log(`followup : datetime`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
-                        document.getElementById("followup").innerHTML += followup + "<br />";
+
+                         var productId = objJSON['FollowUps'].length - 1;
+                        var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                        document.getElementById("followup").innerHTML +=  "\t" + buttonOK +  buttonEDIT_FOLLOWUP + buttonSHOW_FOLLOWUP + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
@@ -575,7 +663,12 @@
                         console.log(`followup : daterange`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
-                        document.getElementById("followup").innerHTML += followup + "<br />";
+
+                       var productId = objJSON['FollowUps'].length - 1;
+                        var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                        document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + buttonSHOW_FOLLOWUP + "<br />";
                         document.getElementById('followupM').style.display = 'block';
                     });
                     var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
@@ -585,8 +678,13 @@
                         console.log(`followup : date`);
                         console.log(objFollowUp);
                         highlightTextInsideDiv(followup);
-                        document.getElementById("followup").innerHTML += followup + "<br />";
-                        document.getElementById('followupM').style.display = 'block';
+
+                         var productId = objJSON['FollowUps'].length - 1;
+                        var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                        var buttonSHOW_FOLLOWUP = `| <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                         document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + buttonSHOW_FOLLOWUP + "<br />";
+                       document.getElementById('followupM').style.display = 'block';
                     });
                     /*##########################FOLLOW UPS##########################*/
                 } 
@@ -631,6 +729,64 @@
                 }
             }
         }
+
+
+    function openPopup(a_type,a_id) {
+        hideChange();
+
+        type = a_type;
+        id = a_id;
+
+        el = document.getElementById("overlay");
+        el.style.visibility =  "visible";
+
+        var input = document.getElementById("result");
+        input.value = objJSON[type][id];
+
+
+    }
+
+     function closePopup() {    
+        type = '';
+        id = '';
+
+        el = document.getElementById("overlay");
+        el.style.visibility = "hidden";
+    }
+
+
+
+    function saveChanges(){
+        if(type != '' || id != '')
+        {
+            var input = document.getElementById("result");
+            objJSON[type][id] = input.value;
+
+            closePopup();
+        }
+    }
+
+    function showChange(a_type,a_id) {
+        closePopup();
+
+        type = a_type;
+        id = a_id;
+
+        el = document.getElementById("changes");
+        el.style.visibility =  "visible";
+
+        document.getElementById("change").innerHTML = objJSON[type][id];
+    }
+
+    function hideChange() {    
+        type = '';
+        id = '';
+
+        el = document.getElementById("changes");
+        el.style.visibility =  "hidden";
+    }
+
+
     </script>
 </body>
 
