@@ -573,8 +573,8 @@
             startBtn.disabled = false;
             stopBtn.disabled = true;
             
-            phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-            and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+            // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+            // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
             if (phraseDiv.innerHTML) {
                 document.getElementById("dvSubmit").style.display = "block";
@@ -729,6 +729,7 @@
             // }
         }
 
+        //Object Extraction using key
         function findObjectByKey(array, key, value) {
             var ArrobjectByKey = [];
             for (var i = 0; i < array.length; i++) {
@@ -760,90 +761,91 @@
             }
         }
 
-    // To highlight text inside the specified div using particular color 
-    function highlightPredefinedTags(a_arrPredefinedTags) {
+        // To highlight text inside the specified div using particular color 
+        function highlightPredefinedTags(a_arrPredefinedTags) {
 
-        a_arrPredefinedTags.forEach((predefinedTag)=>{
+            a_arrPredefinedTags.forEach((predefinedTag)=>{
 
-            var inputText = document.getElementById("productName");
-            var innerHTML = inputText.innerHTML;
-            var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
-               
-            if (index >= 0) { 
-                innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
-                inputText.innerHTML = innerHTML;
-            }
+                var inputText = document.getElementById("productName");
+                var innerHTML = inputText.innerHTML;
+                var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+                    
+                if (index >= 0) { 
+                    innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+                    inputText.innerHTML = innerHTML;
+                }
 
-            var inputText = document.getElementById("keywords");
-            var innerHTML = inputText.innerHTML;
-            var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
-               
-            if (index >= 0) { 
-                innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
-                inputText.innerHTML = innerHTML;
-            }
-        });
-    }
+                var inputText = document.getElementById("keywords");
+                var innerHTML = inputText.innerHTML;
+                var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+                    
+                if (index >= 0) { 
+                    innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+                    inputText.innerHTML = innerHTML;
+                }
+            });
+        }
 
+        // To open Edit Popup  
+        function openPopup(a_type,a_id) {
 
-    function openPopup(a_type,a_id) {
-        //hideChange();
+            type = a_type;
+            id = a_id;
 
-        type = a_type;
-        id = a_id;
+            el = document.getElementById("overlay");
+            el.style.visibility =  "visible";
 
-        el = document.getElementById("overlay");
-        el.style.visibility =  "visible";
-
-        var input = document.getElementById("result");
-        input.value = objJSON[type][id];
-
-        document.getElementById("change").innerHTML = objJSON[type][id];
-    }
-
-     function closePopup() {    
-        type = '';
-        id = '';
-
-        el = document.getElementById("overlay");
-        el.style.visibility = "hidden";
-    }
-
-
-
-    function saveChanges(){
-        if(type != '' || id != '')
-        {
             var input = document.getElementById("result");
-            objJSON[type][id] = input.value;
+            input.value = objJSON[type][id];
 
             document.getElementById("change").innerHTML = objJSON[type][id];
-            //closePopup();
         }
-    }
 
-    function submitToLUIS(){
-        editBtn.disabled = false;
-        document.getElementById("phraseTextArea").style.display = 'none';
+        // To close Edit Popup  
+        function closePopup() {    
+            type = '';
+            id = '';
 
-        phraseDiv.innerHTML = phraseTextArea.value;
-        
-        document.getElementById("productName").innerHTML = "";
-        document.getElementById("keywords").innerHTML = "";
-        document.getElementById("followup").innerHTML = "";
+            el = document.getElementById("overlay");
+            el.style.visibility = "hidden";
+        }
 
-        document.getElementById("product").style.display = "none";
-        document.getElementById('keywordsM').style.display = 'none';
-        document.getElementById('followupM').style.display = 'none';
+        // To save changes in objJSON          
+        function saveChanges(){
+            if(type != '' || id != '')
+            {
+                var input = document.getElementById("result");
+                objJSON[type][id] = input.value;
 
-        extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
-    }
-    function  editResult(){ 
-        document.getElementById("phraseTextArea").style.display = 'block';
+                document.getElementById("change").innerHTML = objJSON[type][id];
+                //closePopup();
+            }
+        }
 
-        editBtn.disabled = true;
-    }
+        // To submit results for LUIS processing
+        function submitToLUIS(){
+            editBtn.disabled = false;
+            document.getElementById("phraseTextArea").style.display = 'none';
 
+            phraseDiv.innerHTML = phraseTextArea.value;
+            
+            document.getElementById("productName").innerHTML = "";
+            document.getElementById("keywords").innerHTML = "";
+            document.getElementById("followup").innerHTML = "";
+
+            document.getElementById("product").style.display = "none";
+            document.getElementById('keywordsM').style.display = 'none';
+            document.getElementById('followupM').style.display = 'none';
+
+            extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
+        }
+
+        // To edit result before Submission
+        function  editResult(){ 
+            document.getElementById("phraseTextArea").style.display = 'block';
+
+            editBtn.disabled = true;
+        }
     </script>
 </body>
 
