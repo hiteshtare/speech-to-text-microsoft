@@ -123,25 +123,55 @@
                         <div class="row" style="padding-top:5px;">
                             <div class="col-sm-3" style="padding-left:10px;">
                                 <!-- <textarea id="phraseDiv" style="display: inline-block;width: 250px;height: 140px;"></textarea> -->
-                                <table>
-                                    <tr>
-                                        <td align="left">Status:</td>
-                                    </tr>
+                                <table>                               
                                     <tr>
                                         <td>
-                                            <div id="listening"></div>
-                                        </td>
+                                            <fieldset>
+                                                <legend>Status:</legend>
+                                                <div id="listening"></div>
+                                            </fieldset>
+                                        </td>       
                                     </tr>
                                     <tr>
                                         <td align="left"><span id="statusDiv"></span></td>
                                     </tr>
-
                                     <tr>
-                                        <td>Results:</td>
+                                        <td>
+                                            <fieldset>
+                                                <legend>Results:</legend>
+                                                <div id="phraseDiv" style="display: inline-block;width:450px;height:150px"></div>
+                                            </fieldset>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div id="phraseDiv" style="display: inline-block;width:350px;height:200px"></div>
+                                            <textarea id="phraseTextArea" style="display: none;width:450px;height:150px"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div id="dvSubmit" style="display:none" class="col-sm-3"><button id="submitBtn" style="background-color: tomato;
+                                                border: none;
+                                                color: white;
+                                                padding: 5px 15px;
+                                                text-align: center;
+                                                text-decoration: none;
+                                                display: inline-block;
+                                                font-size: 16px;
+                                                margin: 4px 2px;
+                                                border-radius: 4px;
+                                                " onclick="submitToLUIS()" >Submit</button></div>
+                                            <div id="dvEdit" style="display:none" class="col-sm-3"><button id="editBtn" style="background-color: darkolivegreen;
+                                                border: none;
+                                                color: white;
+                                                padding: 5px 15px;
+                                                text-align: center;
+                                                text-decoration: none;
+                                                display: inline-block;
+                                                font-size: 16px;
+                                                margin: 4px 2px;
+                                                border-radius: 4px;
+                                                " onclick="editResult()">Edit</button></div>
                                         </td>
                                     </tr>
                                     <tr>
@@ -179,14 +209,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Current hypothesis:</td>
-                                    </tr>
-                                    <tr>
                                         <td style="vertical-align: top">
-                                            <span id="hypothesisDiv" style="width:200px;height:200px;display:block;"></span>
-                                        </td>
+                                            <fieldset>
+                                                <legend>Current hypothesis:</legend>
+                                                <span id="hypothesisDiv" style="width:200px;height:200px;display:block;"></span>
+                                            </fieldset>
+                                        </td>       
                                     </tr>
-
                                 </table>
                             </div>
                         </div>
@@ -419,6 +448,10 @@ var id = '';
             phraseDiv = document.getElementById("phraseDiv");
             hypothesisDiv = document.getElementById("hypothesisDiv");
             statusDiv = document.getElementById("statusDiv");
+            
+            phraseTextArea = document.getElementById("phraseTextArea");
+            submitBtn = document.getElementById("submitBtn");
+            editBtn = document.getElementById("editBtn");
 
             productName = document.getElementById("productName");
             keywords = document.getElementById("keywords");
@@ -451,6 +484,9 @@ var id = '';
 
                 hypothesisDiv.innerHTML = "";
                 phraseDiv.innerHTML = "";
+
+                document.getElementById("dvSubmit").style.display = "none";
+                document.getElementById('dvEdit').style.display = "none";
 
                 document.getElementById("productName").innerHTML = "";
                 document.getElementById("keywords").innerHTML = "";
@@ -554,13 +590,16 @@ var id = '';
         function OnComplete() {
             startBtn.disabled = false;
             stopBtn.disabled = true;
-
+            
             // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
             // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
             if (phraseDiv.innerHTML) {
-                extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
-            }
+                document.getElementById("dvSubmit").style.display = "block";
+                document.getElementById('dvEdit').style.display = "block";
+
+                phraseTextArea.value = phraseDiv.innerHTML;
+           }
         }
 
         var objJSON = {};
@@ -769,6 +808,28 @@ var id = '';
             document.getElementById("change").innerHTML = objJSON[type][id];
             //closePopup();
         }
+    }
+
+    function submitToLUIS(){
+        editBtn.disabled = false;
+        document.getElementById("phraseTextArea").style.display = 'none';
+
+        phraseDiv.innerHTML = phraseTextArea.value;
+        
+        document.getElementById("productName").innerHTML = "";
+        document.getElementById("keywords").innerHTML = "";
+        document.getElementById("followup").innerHTML = "";
+
+        document.getElementById("product").style.display = "none";
+        document.getElementById('keywordsM').style.display = 'none';
+        document.getElementById('followupM').style.display = 'none';
+
+        extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
+    }
+    function  editResult(){ 
+        document.getElementById("phraseTextArea").style.display = 'block';
+
+        editBtn.disabled = true;
     }
 
     // function showChange(a_type,a_id) {
