@@ -19,8 +19,12 @@
         }
 
         .highlight {
-  background-color: aqua;
-}
+            background-color: aqua;
+        }
+
+        .highlight-pre {
+            background-color:#ff9e9e;
+        }
 
 /********************************** OVERLAY *********************************/
 #overlay {
@@ -45,30 +49,6 @@
      left: 40%;
      position: fixed;
 }
-
-/* #changes {
-     visibility: hidden;
-     position: absolute;
-     left: 0px;
-     top: 0px;
-     width:100%;
-     height:100%;
-     text-align:center;
-     z-index: 1000;
-}
-
-#changes div {
-     width:300px;
-     margin: 100px auto;
-     background-color: #fff;
-     border:1px solid #000;
-     padding:15px;
-     text-align:center;
-     background-color:#fbcf80;
-     top: 25%;
-     left: 40%;
-     position: fixed;
-} */
 /********************************** OVERLAY *********************************/
 
     </style>
@@ -438,8 +418,10 @@
         var recognitionMode_value = 'Conversation';
         var inputSource_value = 'Mic';
 
-var type = '';
-var id = '';
+        var type = '';
+        var id = '';
+
+        var arrPredefinedTags = ['plavix','efficacy'];
 
         document.addEventListener("DOMContentLoaded", function () {
             createBtn = document.getElementById("createBtn");
@@ -591,8 +573,8 @@ var id = '';
             startBtn.disabled = false;
             stopBtn.disabled = true;
             
-            // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-            // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+            phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+            and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
             if (phraseDiv.innerHTML) {
                 document.getElementById("dvSubmit").style.display = "block";
@@ -730,6 +712,11 @@ var id = '';
                        document.getElementById('followupM').style.display = 'block';
                     });
                     /*##########################FOLLOW UPS##########################*/
+
+                    /*##########################HIGHLIGHT PredefinedTags##########################*/
+                    highlightPredefinedTags(arrPredefinedTags);
+                    /*##########################HIGHLIGHT PredefinedTags##########################*/
+
                 } 
                 else {
                     objJSON = {};
@@ -772,6 +759,31 @@ var id = '';
                 }
             }
         }
+
+    // To highlight text inside the specified div using particular color 
+    function highlightPredefinedTags(a_arrPredefinedTags) {
+
+        a_arrPredefinedTags.forEach((predefinedTag)=>{
+
+            var inputText = document.getElementById("productName");
+            var innerHTML = inputText.innerHTML;
+            var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+               
+            if (index >= 0) { 
+                innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+                inputText.innerHTML = innerHTML;
+            }
+
+            var inputText = document.getElementById("keywords");
+            var innerHTML = inputText.innerHTML;
+            var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+               
+            if (index >= 0) { 
+                innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+                inputText.innerHTML = innerHTML;
+            }
+        });
+    }
 
 
     function openPopup(a_type,a_id) {
@@ -831,27 +843,6 @@ var id = '';
 
         editBtn.disabled = true;
     }
-
-    // function showChange(a_type,a_id) {
-    //     closePopup();
-
-    //     type = a_type;
-    //     id = a_id;
-
-    //     el = document.getElementById("changes");
-    //     el.style.visibility =  "visible";
-
-    //     document.getElementById("change").innerHTML = objJSON[type][id];
-    // }
-
-    // function hideChange() {    
-    //     type = '';
-    //     id = '';
-
-    //     el = document.getElementById("changes");
-    //     el.style.visibility =  "hidden";
-    // }
-
 
     </script>
 </body>
