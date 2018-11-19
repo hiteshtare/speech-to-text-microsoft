@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("dvSubmit").style.display = "none";
         document.getElementById('dvEdit').style.display = "none";
+        document.getElementById('dvSave').style.display = "none";
+        document.getElementById('dvCancel').style.display = "none";
 
         document.getElementById("productName").innerHTML = "";
         document.getElementById("keywords").innerHTML = "";
@@ -165,13 +167,12 @@ function OnComplete() {
     startBtn.disabled = false;
     stopBtn.disabled = true;
     
-    phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-    and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
     if (phraseDiv.innerHTML) {
         document.getElementById("dvSubmit").style.display = "block";
         document.getElementById('dvEdit').style.display = "block";
-
         phraseTextArea.value = phraseDiv.innerHTML;
    }
 }
@@ -257,7 +258,7 @@ function extractInLUIS(phrase) {
             });
             /*#########################KEY MESSAGES#########################*/
             
-            /*##########################FOLLOW UPS##########################*/
+            /*##########################Follow Ups##########################*/
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
             objFollowUps.forEach((objFollowUp) => {
                 followup = objFollowUp.entity;
@@ -309,6 +310,11 @@ function extractInLUIS(phrase) {
             highlightPredefinedTags(arrPredefinedTags);
             /*##########################HIGHLIGHT PredefinedTags##########################*/
 
+            /*##########################SHOW SAVE BUTTON##########################*/
+            document.getElementById('dvSave').style.display = "block";
+            document.getElementById('dvCancel').style.display = "block";
+            /*##########################SHOW SAVE BUTTON##########################*/
+            
         } 
         else {
             objJSON = {};
@@ -316,6 +322,9 @@ function extractInLUIS(phrase) {
             document.getElementById("product").style.display = "none";
             document.getElementById('keywordsM').style.display = 'none';
             document.getElementById('followupM').style.display = 'none';
+            
+            document.getElementById('dvSave').style.display = "none";
+            document.getElementById('dvCancel').style.display = "none";
         }
     }
     // }
@@ -437,4 +446,35 @@ function  editResult(){
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
+
+    document.getElementById('dvSave').style.display = "none";
+    document.getElementById('dvCancel').style.display = "none";
+}
+
+// To save result in db
+function  saveResult(){ 
+    document.getElementById("phraseTextArea").style.display = 'block';
+
+    editBtn.disabled = true;
+}
+
+// To clear result
+function  clearResult(){
+    
+    hypothesisDiv.innerHTML = "";
+    phraseDiv.innerHTML = "";
+
+    document.getElementById("dvSubmit").style.display = "none";
+    document.getElementById('dvEdit').style.display = "none";
+    document.getElementById('dvSave').style.display = "none";
+    document.getElementById('dvCancel').style.display = "none";
+
+    document.getElementById("productName").innerHTML = "";
+    document.getElementById("keywords").innerHTML = "";
+    document.getElementById("followup").innerHTML = "";
+
+    document.getElementById("product").style.display = "none";
+    document.getElementById('keywordsM').style.display = 'none';
+    document.getElementById('followupM').style.display = 'none';
+
 }
