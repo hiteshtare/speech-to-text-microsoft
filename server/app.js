@@ -16,7 +16,9 @@ var port = process.env.PORT || 5000
 app.use(morgan('dev'));
 
 //Connect to Database
-mongoose.connect(config.mongoURI,{useNewUrlParser: true}).then(() => {
+mongoose.connect(config.mongoURI, {
+  useNewUrlParser: true
+}).then(() => {
   console.log(`Connected to ${config.mongoURI}`);
 }).catch((e) => {
   throw e;
@@ -27,5 +29,3 @@ mongoose.Promise = global.Promise;
 app.listen(port, () => {
   console.log(`Server is listening on port: ${port}`);
 });
-
-

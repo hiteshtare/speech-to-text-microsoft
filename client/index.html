@@ -103,14 +103,14 @@
                         <div class="row" style="padding-top:5px;">
                             <div class="col-sm-3" style="padding-left:10px;">
                                 <!-- <textarea id="phraseDiv" style="display: inline-block;width: 250px;height: 140px;"></textarea> -->
-                                <table>                               
+                                <table>
                                     <tr>
                                         <td>
                                             <fieldset>
                                                 <legend>Status:</legend>
                                                 <div id="listening"></div>
                                             </fieldset>
-                                        </td>       
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td align="left"><span id="statusDiv"></span></td>
@@ -130,7 +130,8 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div id="dvSubmit" style="display:none" class="col-sm-3"><button id="submitBtn" style="background-color: tomato;
+                                            <div id="dvSubmit" style="display:none" class="col-sm-3"><button id="submitBtn"
+                                                    style="background-color: tomato;
                                                 border: none;
                                                 color: white;
                                                 padding: 5px 15px;
@@ -140,8 +141,10 @@
                                                 font-size: 16px;
                                                 margin: 4px 2px;
                                                 border-radius: 4px;
-                                                " onclick="submitToLUIS()" >Submit</button></div>
-                                            <div id="dvEdit" style="display:none" class="col-sm-3"><button id="editBtn" style="background-color: darkolivegreen;
+                                                "
+                                                    onclick="submitToLUIS()">Submit</button></div>
+                                            <div id="dvEdit" style="display:none" class="col-sm-3"><button id="editBtn"
+                                                    style="background-color: darkolivegreen;
                                                 border: none;
                                                 color: white;
                                                 padding: 5px 15px;
@@ -151,7 +154,8 @@
                                                 font-size: 16px;
                                                 margin: 4px 2px;
                                                 border-radius: 4px;
-                                                " onclick="editResult()">Edit</button></div>                                                
+                                                "
+                                                    onclick="editResult()">Edit</button></div>
                                         </td>
                                     </tr>
                                     <tr>
@@ -171,7 +175,8 @@
                                                     <!-- <div class="col-sm-6" ><button onclick="func()">CLICK ME</button></div> -->
                                                 </div>
                                                 <div class="row" style="padding-top:5px;">
-                                                    <div class="col-sm-12" id="keywordsM" style="display:none;"><b>Key Messages</b>
+                                                    <div class="col-sm-12" id="keywordsM" style="display:none;"><b>Key
+                                                            Messages</b>
                                                         <pre id="keywords"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -191,8 +196,9 @@
                                     <tr>
                                         <td>
                                             <div class=" col-padding">
-                                                    <div class="row" style="padding-top:5px;">
-                                                            <div id="dvSave" style="display:none" class="col-sm-3"><button id="saveBtn" style="background-color: #9142a9;
+                                                <div class="row" style="padding-top:5px;">
+                                                    <div id="dvSave" style="display:none" class="col-sm-3"><button id="saveBtn"
+                                                            style="background-color: #9142a9;
                                                                 border: none;
                                                                 color: white;
                                                                 padding: 5px 15px;
@@ -202,8 +208,10 @@
                                                                 font-size: 16px;
                                                                 margin: 4px 2px;
                                                                 border-radius: 4px;
-                                                                " onclick="saveResult()">Save</button></div>
-                                                            <div id="dvCancel" style="display:none" class="col-sm-3"><button id="cancelBtn" style="background-color: #ddd;
+                                                                "
+                                                            onclick="saveResult()">Save</button></div>
+                                                    <div id="dvCancel" style="display:none" class="col-sm-3"><button id="cancelBtn"
+                                                            style="background-color: #ddd;
                                                                 border: none;
                                                                 color: black;
                                                                 padding: 5px 15px;
@@ -213,8 +221,9 @@
                                                                 font-size: 16px;
                                                                 margin: 4px 2px;
                                                                 border-radius: 4px;
-                                                                " onclick="clearResult()">Cancel</button></div>
-                                                    </div>
+                                                                "
+                                                            onclick="clearResult()">Cancel</button></div>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -224,7 +233,7 @@
                                                 <legend>Current hypothesis:</legend>
                                                 <span id="hypothesisDiv" style="width:200px;height:200px;display:block;"></span>
                                             </fieldset>
-                                        </td>       
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
@@ -235,7 +244,7 @@
 
             <div class="col-sm-9 col-md-6 col-lg-7" style="height:100vh;background:url('right.png');">
                 <div class=" col-padding">
-                  
+
                     <table>
 
                     </table>
@@ -248,14 +257,15 @@
 
     <div id="overlay">
         <div>
-        <h4>Edit Popup</h4>
-        Current Value : <pre id="change"></pre>
-        <br>
-             <p><input type="text" id="result" name="result" value=""></p>
-             <br>
-             <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
+            <h4>Edit Popup</h4>
+            Current Value :
+            <pre id="change"></pre>
+            <br>
+            <p><input type="text" id="result" name="result" value=""></p>
+            <br>
+            <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
         </div>
-   </div>
+    </div>
 
     <!-- SDK REFERENCE -->
     <script src="speech.sdk.bundle.js"></script>

@@ -13,7 +13,7 @@ var inputSource_value = 'Mic';
 var type = '';
 var id = '';
 
-var arrPredefinedTags = ['plavix','efficacy'];
+var arrPredefinedTags = ['plavix', 'efficacy'];
 
 document.addEventListener("DOMContentLoaded", function () {
     createBtn = document.getElementById("createBtn");
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     phraseDiv = document.getElementById("phraseDiv");
     hypothesisDiv = document.getElementById("hypothesisDiv");
     statusDiv = document.getElementById("statusDiv");
-    
+
     phraseTextArea = document.getElementById("phraseTextArea");
     submitBtn = document.getElementById("submitBtn");
     editBtn = document.getElementById("editBtn");
@@ -166,7 +166,7 @@ function UpdateRecognizedPhrase(json) {
 function OnComplete() {
     startBtn.disabled = false;
     stopBtn.disabled = true;
-    
+
     // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
     // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
@@ -174,7 +174,7 @@ function OnComplete() {
         document.getElementById("dvSubmit").style.display = "block";
         document.getElementById('dvEdit').style.display = "block";
         phraseTextArea.value = phraseDiv.innerHTML;
-   }
+    }
 }
 
 var objJSON = {};
@@ -210,19 +210,18 @@ function extractInLUIS(phrase) {
             objJSON['FollowUps'] = [];
 
             var buttonOK = `Approval: <input type="radio" name="approve" value="yes"> Yes  <input type="radio" name="approve" value="no"> No | `;
-        
+
             /*############################PRODUCT############################*/
             var objProducts = findObjectByKey(token.entities, "type", "brand");
-            objProducts.forEach((objProduct,index) => {
+            objProducts.forEach((objProduct, index) => {
                 productName = objProduct.entity;
                 objJSON['Products'].push(productName);
                 score = objProduct.score;
                 console.log(`objProduct`);
                 console.log(objProduct);
-               
-                if(index ===0)
-                {
-                    document.getElementById("productName").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+
+                if (index === 0) {
+                    document.getElementById("productName").innerHTML += "<i>score : " + score + "</i>" + "\n";
                 }
                 highlightTextInsideDiv(productName);
 
@@ -230,22 +229,21 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('Products',${productId})">Edit</button>`;
                 var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
 
-                document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT  + "\n";
+                document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT + "\n";
                 document.getElementById('product').style.display = 'block';
             });
             /*############################PRODUCT############################*/
-            
+
             /*#########################KEY MESSAGES#########################*/
             var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
-            objKeyMessages.forEach((objKeyMessage,index) => {
+            objKeyMessages.forEach((objKeyMessage, index) => {
                 keyMessages = objKeyMessage.entity;
                 objJSON['KeyMessages'].push(keyMessages);
                 score = objKeyMessage.score;
                 console.log(`objKeyMessage`);
                 console.log(objKeyMessage);
-                if(index ===0)
-                {
-                    document.getElementById("keywords").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+                if (index === 0) {
+                    document.getElementById("keywords").innerHTML += "<i>score : " + score + "</i>" + "\n";
                 }
                 highlightTextInsideDiv(keyMessages);
 
@@ -253,11 +251,11 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('KeyMessages',${productId})">Edit</button>`;
                 var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
 
-                document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK +  buttonEDIT_KEYMESSAGE + "\n";
+                document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK + buttonEDIT_KEYMESSAGE + "\n";
                 document.getElementById('keywordsM').style.display = 'block';
             });
             /*#########################KEY MESSAGES#########################*/
-            
+
             /*##########################Follow Ups##########################*/
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
             objFollowUps.forEach((objFollowUp) => {
@@ -267,11 +265,11 @@ function extractInLUIS(phrase) {
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-                 var productId = objJSON['FollowUps'].length - 1;
+                var productId = objJSON['FollowUps'].length - 1;
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                document.getElementById("followup").innerHTML +=  "\t" + buttonOK +  buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById("followup").innerHTML += "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
                 document.getElementById('followupM').style.display = 'block';
             });
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
@@ -282,11 +280,11 @@ function extractInLUIS(phrase) {
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-               var productId = objJSON['FollowUps'].length - 1;
+                var productId = objJSON['FollowUps'].length - 1;
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
+                document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
                 document.getElementById('followupM').style.display = 'block';
             });
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
@@ -297,12 +295,12 @@ function extractInLUIS(phrase) {
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-                 var productId = objJSON['FollowUps'].length - 1;
+                var productId = objJSON['FollowUps'].length - 1;
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
 
-                 document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
-               document.getElementById('followupM').style.display = 'block';
+                document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById('followupM').style.display = 'block';
             });
             /*##########################FOLLOW UPS##########################*/
 
@@ -314,15 +312,14 @@ function extractInLUIS(phrase) {
             document.getElementById('dvSave').style.display = "block";
             document.getElementById('dvCancel').style.display = "block";
             /*##########################SHOW SAVE BUTTON##########################*/
-            
-        } 
-        else {
+
+        } else {
             objJSON = {};
 
             document.getElementById("product").style.display = "none";
             document.getElementById('keywordsM').style.display = 'none';
             document.getElementById('followupM').style.display = 'none';
-            
+
             document.getElementById('dvSave').style.display = "none";
             document.getElementById('dvCancel').style.display = "none";
         }
@@ -346,18 +343,17 @@ function highlightTextInsideDiv(text) {
     var inputText = document.getElementById("phraseDiv");
     var innerHTML = inputText.innerHTML;
     var index = innerHTML.indexOf(text); //For Lowercase only
-       
-    if (index >= 0) { 
-        innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+
+    if (index >= 0) {
+        innerHTML = innerHTML.substring(0, index) + "<span class='highlight'>" + innerHTML.substring(index, index + text.length) + "</span>" + innerHTML.substring(index + text.length);
         inputText.innerHTML = innerHTML;
-    }
-    else { //For Camelcase i.e First Character is in Upper Case
+    } else { //For Camelcase i.e First Character is in Upper Case
         var capitalizeFirstLetter = text.charAt(0).toUpperCase() + text.slice(1);
         var newIndex = innerHTML.indexOf(capitalizeFirstLetter);
 
-      if (newIndex >= 0) { 
-        innerHTML = innerHTML.substring(0,newIndex) + "<span class='highlight'>" + innerHTML.substring(newIndex,newIndex+capitalizeFirstLetter.length) + "</span>" + innerHTML.substring(newIndex + capitalizeFirstLetter.length);
-        inputText.innerHTML = innerHTML;
+        if (newIndex >= 0) {
+            innerHTML = innerHTML.substring(0, newIndex) + "<span class='highlight'>" + innerHTML.substring(newIndex, newIndex + capitalizeFirstLetter.length) + "</span>" + innerHTML.substring(newIndex + capitalizeFirstLetter.length);
+            inputText.innerHTML = innerHTML;
         }
     }
 }
@@ -365,36 +361,36 @@ function highlightTextInsideDiv(text) {
 // To highlight text inside the specified div using particular color 
 function highlightPredefinedTags(a_arrPredefinedTags) {
 
-    a_arrPredefinedTags.forEach((predefinedTag)=>{
+    a_arrPredefinedTags.forEach((predefinedTag) => {
 
         var inputText = document.getElementById("productName");
         var innerHTML = inputText.innerHTML;
         var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
-            
-        if (index >= 0) { 
-            innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+
+        if (index >= 0) {
+            innerHTML = innerHTML.substring(0, index) + "<span class='highlight-pre'>" + innerHTML.substring(index, index + predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
             inputText.innerHTML = innerHTML;
         }
 
         var inputText = document.getElementById("keywords");
         var innerHTML = inputText.innerHTML;
         var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
-            
-        if (index >= 0) { 
-            innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+
+        if (index >= 0) {
+            innerHTML = innerHTML.substring(0, index) + "<span class='highlight-pre'>" + innerHTML.substring(index, index + predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
             inputText.innerHTML = innerHTML;
         }
     });
 }
 
 // To open Edit Popup  
-function openPopup(a_type,a_id) {
+function openPopup(a_type, a_id) {
 
     type = a_type;
     id = a_id;
 
     el = document.getElementById("overlay");
-    el.style.visibility =  "visible";
+    el.style.visibility = "visible";
 
     var input = document.getElementById("result");
     input.value = objJSON[type][id];
@@ -403,7 +399,7 @@ function openPopup(a_type,a_id) {
 }
 
 // To close Edit Popup  
-function closePopup() {    
+function closePopup() {
     type = '';
     id = '';
 
@@ -412,9 +408,8 @@ function closePopup() {
 }
 
 // To save changes in objJSON          
-function saveChanges(){
-    if(type != '' || id != '')
-    {
+function saveChanges() {
+    if (type != '' || id != '') {
         var input = document.getElementById("result");
         objJSON[type][id] = input.value;
 
@@ -424,12 +419,12 @@ function saveChanges(){
 }
 
 // To submit results for LUIS processing
-function submitToLUIS(){
+function submitToLUIS() {
     editBtn.disabled = false;
     document.getElementById("phraseTextArea").style.display = 'none';
 
     phraseDiv.innerHTML = phraseTextArea.value;
-    
+
     document.getElementById("productName").innerHTML = "";
     document.getElementById("keywords").innerHTML = "";
     document.getElementById("followup").innerHTML = "";
@@ -442,7 +437,7 @@ function submitToLUIS(){
 }
 
 // To edit result before Submission
-function  editResult(){ 
+function editResult() {
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
@@ -452,15 +447,15 @@ function  editResult(){
 }
 
 // To save result in db
-function  saveResult(){ 
+function saveResult() {
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
 }
 
 // To clear result
-function  clearResult(){
-    
+function clearResult() {
+
     hypothesisDiv.innerHTML = "";
     phraseDiv.innerHTML = "";
 

@@ -1,0 +1,321 @@
+swagger: '2.0'
+info:
+  description: API documentation for Call Notes poc
+  version: 1.0.0
+  title: Call Notes poc
+host: 'localhost:3000'
+basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /notes:
+    post:
+      tags:
+        - Notes
+      summary: Adds new note
+      operationId: createnote
+      parameters:
+        - in: body
+          name: Request body
+          description: note info
+          required: true
+          schema:
+            $ref: '#/definitions/Note'
+      responses:
+        '201':
+          description: Created response with Note data
+          schema:
+            description: Note data
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: true
+                description: Always true
+              status:
+                type: integer
+                default: 201
+                description: Http status code
+              payload:
+                $ref: '#/definitions/Note'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Notes
+      summary: Gets list of available notes
+      operationId: getAllNotes
+      responses:
+        '200':
+          description: Success response with List of notes
+          schema:
+            description: List of notes
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: true
+                description: Always true
+              status:
+                type: integer
+                default: 200
+                description: Http status code
+              payload:
+                type: array
+                items:
+                  $ref: '#/definitions/Note'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Notes
+      summary: Deletes (sets in_active to true) the specified note
+      operationId: deleteNote
+      parameters:
+        - name: id
+          in: path
+          description: Note id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success response with Note id
+          schema:
+            description: Note id
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: true
+                description: Always true
+              status:
+                type: integer
+                default: 200
+                description: Http status code
+              payload:
+                type: integer
+                format: int64
+                example: 12345
+                description: Delete id
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/notes/{id}':
+    put:
+      tags:
+        - Notes
+      summary: Updates the specified note
+      operationId: updateNote
+      parameters:
+        - name: id
+          in: path
+          description: Note id
+          required: true
+          type: string
+        - in: body
+          name: Request body
+          description: Note info
+          required: true
+          schema:
+            type: object
+            properties:
+              is_transcript_approve:
+                 type: boolean
+                 description: Is transcript approved
+                 example: true
+      responses:
+        '200':
+          description: Success response with Note data
+          schema:
+            description: Note data
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: true
+                description: Always true
+              status:
+                type: integer
+                default: 200
+                description: Http status code
+              payload:
+                $ref: '#/definitions/Note'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Notes
+      summary: Get the specified note
+      operationId: getNoteById
+      parameters:
+        - name: id
+          in: path
+          description: Note id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success - User data
+          schema:
+            description: User data
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: true
+                description: Always true
+              status:
+                type: integer
+                default: 200
+                description: Http status code
+              payload:
+                $ref: '#/definitions/Note'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Note:
+    type: object
+    description: A note object 
+    properties:
+      _id:
+        type: string
+        description: Unique mongo object id of the note
+        example: '1234-5678-1234'
+      transcript:
+        type: array
+        items:
+         $ref: '#/definitions/Value'
+        example: [{'before':'plastics','after':'plavix'},
+        {'before':'lyrics','after':'clinic'}]
+      is_transcript_approve:
+        type: boolean
+        description: Is transcript approved
+        example: false
+      entities:
+         $ref: '#/definitions/Entities'
+      is_active:
+        type: boolean
+        description: Is element active
+        example: true
+      created_at:
+        type: string
+        format: date-time
+        description: Datetime element was created
+        example: '1995-09-07T10:40:52Z'
+      updated_at:
+        type: string
+        format: date-time
+        description: Datetime element was updated
+        example: '1995-09-10T10:45:52Z'
+      deleted_at:
+        type: string
+        format: date-time
+        description: Datetime element was deleted
+        example: '1995-09-20T10:50:52Z'
+    required:
+      - _id
+      - transcript
+      - is_transcript_approve
+      - entities
+    xml:
+      name: Note
+  Error:
+    type: object
+    description: An error response
+    properties:
+      success:
+        type: boolean
+        default: false
+        description: Success can be either true or false depending on the logic
+      status:
+        type: string
+        description: Http status code
+      code:
+        type: number
+        format: int32
+        minimum: 1
+        description: Internal error code
+      message:
+        type: string
+        description: Detailed error message
+    xml:
+      name: Error
+  Entities:
+    type: object
+    description: A entities object
+    properties:
+      product:
+        description: A product object
+        type: array
+        items:
+         $ref: '#/definitions/Value'
+        example: [{'before':'plastics','after':'plavix','is_approve':'false','status':'pending'}]
+      keymessage:
+        description: A followup object
+        type: array
+        items:
+         $ref: '#/definitions/Value'
+        example: [{'before':'lyrics','after':'clinic','is_approve':'true','status':'pending for LUIS Training'}]
+      followup:
+        description: A keymessage object
+        type: array
+        items:
+         $ref: '#/definitions/Value'
+        example: [{'before':'Tuesday','after':'Thursday','is_approve':'false','status':'rejected'}]
+    xml:
+      name: Entities
+  Value:
+    type: object
+    description: A value object having before and after properties
+    properties:
+      before:
+        type: string
+        description: Value before edit
+      after:
+        type: string
+        description: Value after edit
+      is_approve:
+        type: boolean
+        description: Is value approved
+        example: false
+      status:
+        type: boolean
+        description: State of the approval
+        example: pending, pending for LUIS Training, rejected
+    required:
+      - before
+      - after
+      - is_approve
+    xml:
+      name: Value
