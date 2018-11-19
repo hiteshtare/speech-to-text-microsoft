@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Omnipresence Labs</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        button:disabled,
+        button[disabled] {
+            border: 1px solid #999999 !important;
+            background-color: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed;
+        }
+
+        .highlight {
+            background-color: aqua;
+        }
+
+        .highlight-pre {
+            background-color:#ff9e9e;
+        }
+
+/********************************** OVERLAY *********************************/
+#overlay {
+     visibility: hidden;
+     position: absolute;
+     left: 0px;
+     top: 0px;
+     width:100%;
+     height:100%;
+     text-align:center;
+     z-index: 1000;
+}
+
+#overlay div {
+     width:300px;
+     margin: 100px auto;
+     background-color: #fff;
+     border:1px solid #000;
+     padding:15px;
+     text-align:center;
+     background-color: #fbcf80;
+     left: 40%;
+     position: fixed;
+}
+/********************************** OVERLAY *********************************/
+
+    </style>
+</head>
+
+<body style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px;">
+    <div id="warning">
+        <h1 style="font-weight:500;">Speech Recognition SDK not found.</h1>
+        <h2 style="font-weight:500;">Please execute <code>npm run bundle</code> and reload.</h2>
+    </div>
+    <div class="container">
+        <div class="row grid-divider" style="border-style: solid;border-color:#efeff4">
+            <div class="col-sm-3 col-md-6 col-lg-5" style="background-color:#f7f7f7;height:100vh;">
+                <div class="col-padding">
+                    <div id="header">
+                        <div class="row" style="background-color:#7ab033;height: 54px;">
+                            <div>
+                                <p style="padding-top:15px;color:white;font-size: 16px;">&nbsp;&nbsp;&nbsp;&nbsp;Genee
+                                    Notes
+                                    Assistant</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="content">
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-sm-3">
+                                <button id="startBtn" disabled="disabled" class="startButton" style="background-color: #1b75bb;
+                    border: none;
+                    color: white;
+                    padding: 5px 15px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    border-radius: 4px;
+                    ">Listen</button>
+                            </div>
+                            <!-- <div class="col-sm-3" ></div> -->
+                            <div class="col-sm-3"><button id="stopBtn" disabled="disabled" style="background-color: #1b75bb;
+                    border: none;
+                    color: white;
+                    padding: 5px 15px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    border-radius: 4px;
+                    ">Stop</button></div>
+                        </div>
+                        <div class="row" style="padding-top:5px;">
+                            <div class="col-sm-3" style="padding-left:10px;">
+                                <!-- <textarea id="phraseDiv" style="display: inline-block;width: 250px;height: 140px;"></textarea> -->
+                                <table>                               
+                                    <tr>
+                                        <td>
+                                            <fieldset>
+                                                <legend>Status:</legend>
+                                                <div id="listening"></div>
+                                            </fieldset>
+                                        </td>       
+                                    </tr>
+                                    <tr>
+                                        <td align="left"><span id="statusDiv"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <fieldset>
+                                                <legend>Results:</legend>
+                                                <div id="phraseDiv" style="display: inline-block;width:450px;height:150px"></div>
+                                            </fieldset>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <textarea id="phraseTextArea" style="display: none;width:450px;height:150px"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div id="dvSubmit" style="display:none" class="col-sm-3"><button id="submitBtn" style="background-color: tomato;
+                                                border: none;
+                                                color: white;
+                                                padding: 5px 15px;
+                                                text-align: center;
+                                                text-decoration: none;
+                                                display: inline-block;
+                                                font-size: 16px;
+                                                margin: 4px 2px;
+                                                border-radius: 4px;
+                                                " onclick="submitToLUIS()" >Submit</button></div>
+                                            <div id="dvEdit" style="display:none" class="col-sm-3"><button id="editBtn" style="background-color: darkolivegreen;
+                                                border: none;
+                                                color: white;
+                                                padding: 5px 15px;
+                                                text-align: center;
+                                                text-decoration: none;
+                                                display: inline-block;
+                                                font-size: 16px;
+                                                margin: 4px 2px;
+                                                border-radius: 4px;
+                                                " onclick="editResult()">Edit</button></div>                                                
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div id="loading"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class=" col-padding">
+                                                <!-- <img src="right.png" style=" height: 102vh; width: 100vh;"> -->
+                                                <div class="row" style="padding-top:5px;">
+                                                    <div class="col-sm-12" id="product" style="display:none;"><b>Products</b>
+                                                        <pre id="productName"></pre>
+                                                    </div>
+                                                    <!-- <div class="col-sm-6"></div> -->
+                                                    <!-- <div class="col-sm-6" ><button onclick="func()">CLICK ME</button></div> -->
+                                                </div>
+                                                <div class="row" style="padding-top:5px;">
+                                                    <div class="col-sm-12" id="keywordsM" style="display:none;"><b>Key Messages</b>
+                                                        <pre id="keywords"></pre>
+                                                    </div>
+                                                    <!-- <div class="col-sm-6"></div> -->
+                                                    <!-- <div class="col-sm-6" ><button onclick="func()">CLICK ME</button></div> -->
+                                                </div>
+                                                <div class="row" style="padding-top:5px;">
+                                                    <div class="col-sm-12" id="followupM" style="display:none;"><b>Follow
+                                                            Ups</b>
+                                                        <pre id="followup"></pre>
+                                                    </div>
+                                                    <!-- <div class="col-sm-6"></div> -->
+                                                    <!-- <div class="col-sm-6" ><button onclick="func()">CLICK ME</button></div> -->
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class=" col-padding">
+                                                    <div class="row" style="padding-top:5px;">
+                                                            <div id="dvSave" style="display:none" class="col-sm-3"><button id="saveBtn" style="background-color: #9142a9;
+                                                                border: none;
+                                                                color: white;
+                                                                padding: 5px 15px;
+                                                                text-align: center;
+                                                                text-decoration: none;
+                                                                display: inline-block;
+                                                                font-size: 16px;
+                                                                margin: 4px 2px;
+                                                                border-radius: 4px;
+                                                                " onclick="saveResult()">Save</button></div>
+                                                            <div id="dvCancel" style="display:none" class="col-sm-3"><button id="cancelBtn" style="background-color: #ddd;
+                                                                border: none;
+                                                                color: black;
+                                                                padding: 5px 15px;
+                                                                text-align: center;
+                                                                text-decoration: none;
+                                                                display: inline-block;
+                                                                font-size: 16px;
+                                                                margin: 4px 2px;
+                                                                border-radius: 4px;
+                                                                " onclick="clearResult()">Cancel</button></div>
+                                                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top">
+                                            <fieldset>
+                                                <legend>Current hypothesis:</legend>
+                                                <span id="hypothesisDiv" style="width:200px;height:200px;display:block;"></span>
+                                            </fieldset>
+                                        </td>       
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-9 col-md-6 col-lg-7" style="height:100vh;background:url('right.png');">
+                <div class=" col-padding">
+                  
+                    <table>
+
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="overlay">
+        <div>
+        <h4>Edit Popup</h4>
+        Current Value : <pre id="change"></pre>
+        <br>
+             <p><input type="text" id="result" name="result" value=""></p>
+             <br>
+             <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
+        </div>
+   </div>
+
+    <!-- SDK REFERENCE -->
+    <script src="speech.sdk.bundle.js"></script>
+    <!-- SDK REFERENCE -->
+
+    <!-- Our Business Logic script -->
+    <script src="app.js"></script>
+    <!-- Our Business Logic script -->
+
+    <!-- SDK USAGE -->
+    <script>
+        // On document load resolve the SDK dependency
+        function Initialize(onComplete) {
+            if (!!window.SDK) {
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('warning').style.display = 'none';
+                onComplete(window.SDK);
+            }
+        }
+
+        // Setup the recognizer
+        function RecognizerSetup(SDK, recognitionMode, language, format, subscriptionKey) {
+
+            switch (recognitionMode) {
+                case "Conversation":
+                    recognitionMode = SDK.RecognitionMode.Conversation;
+                    break;
+                case "Interactive":
+                    recognitionMode = SDK.RecognitionMode.Interactive;
+                    break;
+                case "Dictation":
+                    recognitionMode = SDK.RecognitionMode.Dictation;
+                    break;
+                default:
+                    recognitionMode = SDK.RecognitionMode.Conversation; // default mode is conservation
+            }
+
+            var recognizerConfig = new SDK.RecognizerConfig(
+                new SDK.SpeechConfig(
+                    new SDK.Context(
+                        new SDK.OS(navigator.userAgent, "Browser", null),
+                        new SDK.Device("SpeechSample", "SpeechSample", "1.0.00000"))),
+                recognitionMode,
+                language, // Supported languages are specific to each recognition mode. Refer to docs.
+                format); // SDK.SpeechResultFormat.Simple (Options - Simple/Detailed)
+
+
+            var useTokenAuth = false;
+
+            var authentication = function () {
+                if (!useTokenAuth)
+                    return new SDK.CognitiveSubscriptionKeyAuthentication(subscriptionKey);
+
+                var callback = function () {
+                    var tokenDeferral = new SDK.Deferred();
+                    try {
+                        var xhr = new(XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                        xhr.open('GET', '/token', 1);
+                        xhr.onload = function () {
+                            if (xhr.status === 200) {
+                                tokenDeferral.Resolve(xhr.responseText);
+                            } else {
+                                tokenDeferral.Reject('Issue token request failed.');
+                            }
+                        };
+                        xhr.send();
+                    } catch (e) {
+                        window.console && console.log(e);
+                        tokenDeferral.Reject(e.message);
+                    }
+                    return tokenDeferral.Promise();
+                }
+
+                return new SDK.CognitiveTokenAuthentication(callback, callback);
+            }();
+
+            // var files = document.getElementById('filePicker').files;
+            // if (!files.length) {
+            return SDK.CreateRecognizer(recognizerConfig, authentication);
+            // } else {
+            //     return SDK.CreateRecognizerWithFileAudioSource(recognizerConfig, authentication, files[0]);
+            // }
+        }
+
+        // Start the recognition
+        function RecognizerStart(SDK, recognizer) {
+            recognizer.Recognize((event) => {
+                    /*
+                     Alternative syntax for typescript devs.
+                     if (event instanceof SDK.RecognitionTriggeredEvent)
+                    */
+                    switch (event.Name) {
+                        case "RecognitionTriggeredEvent":
+                            UpdateStatus("Initializing");
+                            break;
+                        case "ListeningStartedEvent":
+                            UpdateStatus("Listening");
+                            break;
+                        case "RecognitionStartedEvent":
+                            UpdateStatus("Listening_Recognizing");
+                            break;
+                        case "SpeechStartDetectedEvent":
+                            UpdateStatus("Listening_DetectedSpeech_Recognizing");
+                            console.log(JSON.stringify(event.Result)); // check console for other information in result
+                            break;
+                        case "SpeechHypothesisEvent":
+                            UpdateRecognizedHypothesis(event.Result.Text, false);
+                            console.log(JSON.stringify(event.Result)); // check console for other information in result
+                            break;
+                        case "SpeechFragmentEvent":
+                            UpdateRecognizedHypothesis(event.Result.Text, true);
+                            console.log(JSON.stringify(event.Result)); // check console for other information in result
+                            break;
+                        case "SpeechEndDetectedEvent":
+                            OnSpeechEndDetected();
+                            UpdateStatus("Processing_Adding_Final_Touches");
+                            console.log(JSON.stringify(event.Result)); // check console for other information in result
+                            break;
+                        case "SpeechSimplePhraseEvent":
+                            UpdateRecognizedPhrase(JSON.stringify(event.Result, null, 3));
+                            break;
+                        case "SpeechDetailedPhraseEvent":
+                            UpdateRecognizedPhrase(JSON.stringify(event.Result, null, 3));
+                            break;
+                        case "RecognitionEndedEvent":
+                            OnComplete();
+                            UpdateStatus("Idle");
+                            console.log(JSON.stringify(event)); // Debug information
+                            break;
+                        default:
+                            console.log(JSON.stringify(event)); // Debug information
+                    }
+                })
+                .On(() => {
+                        // The request succeeded. Nothing to do here.
+                    },
+                    (error) => {
+                        console.error(error);
+                    });
+        }
+
+        // Stop the Recognition.
+        function RecognizerStop(SDK, recognizer) {
+            // recognizer.AudioSource.Detach(audioNodeId) can be also used here. (audioNodeId is part of ListeningStartedEvent)
+            recognizer.AudioSource.TurnOff();
+        }
+    </script>
+    <!-- SDK USAGE -->
+
+
+</body>
+
+</html>

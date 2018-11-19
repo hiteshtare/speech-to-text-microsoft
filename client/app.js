@@ -1,0 +1,480 @@
+var startBtn, stopBtn, hypothesisDiv, phraseDiv, statusDiv;
+var key, languageOptions, formatOptions, recognitionMode, inputSource, filePicker;
+var SDK;
+var recognizer;
+var previousSubscriptionKey;
+
+var key_value = '25061b8c43ac4cb5a13512edf7cfdac3';
+var languageOptions_value = 'en-US';
+var formatOptions_value = 'Simple';
+var recognitionMode_value = 'Conversation';
+var inputSource_value = 'Mic';
+
+var type = '';
+var id = '';
+
+var arrPredefinedTags = ['plavix','efficacy'];
+
+document.addEventListener("DOMContentLoaded", function () {
+    createBtn = document.getElementById("createBtn");
+    startBtn = document.getElementById("startBtn");
+    stopBtn = document.getElementById("stopBtn");
+    phraseDiv = document.getElementById("phraseDiv");
+    hypothesisDiv = document.getElementById("hypothesisDiv");
+    statusDiv = document.getElementById("statusDiv");
+    
+    phraseTextArea = document.getElementById("phraseTextArea");
+    submitBtn = document.getElementById("submitBtn");
+    editBtn = document.getElementById("editBtn");
+
+    productName = document.getElementById("productName");
+    keywords = document.getElementById("keywords");
+    followup = document.getElementById("followup");
+
+    // key = document.getElementById("key");
+    // languageOptions = document.getElementById("languageOptions");
+    // formatOptions = document.getElementById("formatOptions");
+    // inputSource = document.getElementById("inputSource");
+    // recognitionMode = document.getElementById("recognitionMode");
+
+    filePicker = document.getElementById('filePicker');
+
+    //languageOptions.addEventListener("change", Setup);
+    //formatOptions.addEventListener("change", Setup);
+    //recognitionMode.addEventListener("change", Setup);
+
+    startBtn.addEventListener("click", function () {
+        if (key_value == "" || key_value == "YOUR_BING_SPEECH_API_KEY") {
+            alert("Please enter your Bing Speech subscription key!");
+            return;
+        }
+        // if (inputSource.value === "File") {
+        //     filePicker.click();
+        // } else {
+        if (!recognizer || previousSubscriptionKey != key_value) {
+            previousSubscriptionKey = key_value;
+            Setup();
+        }
+
+        hypothesisDiv.innerHTML = "";
+        phraseDiv.innerHTML = "";
+
+        document.getElementById("dvSubmit").style.display = "none";
+        document.getElementById('dvEdit').style.display = "none";
+        document.getElementById('dvSave').style.display = "none";
+        document.getElementById('dvCancel').style.display = "none";
+
+        document.getElementById("productName").innerHTML = "";
+        document.getElementById("keywords").innerHTML = "";
+        document.getElementById("followup").innerHTML = "";
+
+        document.getElementById("product").style.display = "none";
+        document.getElementById('keywordsM').style.display = 'none';
+        document.getElementById('followupM').style.display = 'none';
+
+        RecognizerStart(SDK, recognizer);
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        //}
+    });
+
+    // key.addEventListener("focus", function () {
+    //     if (key_value == "YOUR_BING_SPEECH_API_KEY") {
+    //         key_value = "";
+    //     }
+    // });
+
+    // key.addEventListener("focusout", function () {
+    //     if (key_value == "") {
+    //         key_value = "YOUR_BING_SPEECH_API_KEY";
+    //     }
+    // });
+
+    // filePicker.addEventListener("change", function () {
+    //     Setup();
+    //     hypothesisDiv.innerHTML = "";
+    //     phraseDiv.innerHTML = "";
+    //     RecognizerStart(SDK, recognizer);
+    //     startBtn.disabled = true;
+    //     stopBtn.disabled = false;
+    //     filePicker.value = "";
+    // });
+
+    stopBtn.addEventListener("click", function () {
+        RecognizerStop(SDK, recognizer);
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+
+        // extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
+    });
+
+    Initialize(function (speechSdk) {
+        SDK = speechSdk;
+        startBtn.disabled = false;
+    });
+});
+
+function Setup() {
+    if (recognizer != null) {
+        RecognizerStop(SDK, recognizer);
+    }
+    recognizer = RecognizerSetup(SDK, recognitionMode_value, languageOptions_value, SDK.SpeechResultFormat[
+        formatOptions_value], key_value);
+}
+
+function UpdateStatus(status) {
+
+    if (status != "Idle") {
+        document.getElementById("listening").innerHTML =
+            '<img src="./horizontal.gif">';
+    } else {
+        document.getElementById("listening").innerHTML = '';
+    }
+
+    statusDiv.innerHTML = status;
+}
+
+function UpdateRecognizedHypothesis(text, append) {
+    if (append)
+        hypothesisDiv.innerHTML += text + " ";
+    else
+        hypothesisDiv.innerHTML = text;
+
+    var length = hypothesisDiv.innerHTML.length;
+    if (length > 403) {
+        hypothesisDiv.innerHTML = "..." + hypothesisDiv.innerHTML.substr(length - 400, length);
+    }
+}
+
+function OnSpeechEndDetected() {
+    stopBtn.disabled = true;
+}
+
+function UpdateRecognizedPhrase(json) {
+    hypothesisDiv.innerHTML = "";
+    let objJson = JSON.parse(json); //Parse json string into json object
+    let displayText = objJson.DisplayText;
+    //Check if the displayText is not undefined
+    if (displayText) {
+        console.log(`displayText`);
+        console.log(displayText);
+        phraseDiv.innerHTML += displayText + "\n";
+    }
+}
+
+//Called when RecognationEnded event is raised. 
+function OnComplete() {
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    
+    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+
+    if (phraseDiv.innerHTML) {
+        document.getElementById("dvSubmit").style.display = "block";
+        document.getElementById('dvEdit').style.display = "block";
+        phraseTextArea.value = phraseDiv.innerHTML;
+   }
+}
+
+var objJSON = {};
+
+//Intent/Entity Extraction using LUIS
+function extractInLUIS(phrase) {
+    console.log(`phrase`);
+    console.log(phrase);
+    var url =
+        "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/7317a1ca-fccc-4216-992d-a73f79dfafc5?subscription-key=10ddb0b870ea4e7fb06245e99559c248&timezoneOffset=-360&q=" +
+        phrase;
+    console.log(url);
+    document.getElementById("loading").innerHTML =
+        '<img src="http://preloaders.net/preloaders/287/Filling%20broken%20ring.gif">loading...';
+
+    var a = new XMLHttpRequest();
+    a.open("GET", url);
+    a.send("");
+    a.onload = function () {
+        document.getElementById("loading").innerHTML = '';
+        var token = JSON.parse(this.responseText);
+        var tokenSearch = JSON.stringify(this.responseText);
+        console.log(`this.responseText`);
+        console.log(this.responseText);
+        console.log(`token`);
+        console.log(token);
+        //console.log(token.entities[0].entity);
+        console.log(`token.entities.length`);
+        console.log(token.entities.length);
+        if (token.entities.length > 0) {
+            objJSON['Products'] = [];
+            objJSON['KeyMessages'] = [];
+            objJSON['FollowUps'] = [];
+
+            var buttonOK = `Approval: <input type="radio" name="approve" value="yes"> Yes  <input type="radio" name="approve" value="no"> No | `;
+        
+            /*############################PRODUCT############################*/
+            var objProducts = findObjectByKey(token.entities, "type", "brand");
+            objProducts.forEach((objProduct,index) => {
+                productName = objProduct.entity;
+                objJSON['Products'].push(productName);
+                score = objProduct.score;
+                console.log(`objProduct`);
+                console.log(objProduct);
+               
+                if(index ===0)
+                {
+                    document.getElementById("productName").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+                }
+                highlightTextInsideDiv(productName);
+
+                var productId = objJSON['Products'].length - 1;
+                var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('Products',${productId})">Edit</button>`;
+                var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
+
+                document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT  + "\n";
+                document.getElementById('product').style.display = 'block';
+            });
+            /*############################PRODUCT############################*/
+            
+            /*#########################KEY MESSAGES#########################*/
+            var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
+            objKeyMessages.forEach((objKeyMessage,index) => {
+                keyMessages = objKeyMessage.entity;
+                objJSON['KeyMessages'].push(keyMessages);
+                score = objKeyMessage.score;
+                console.log(`objKeyMessage`);
+                console.log(objKeyMessage);
+                if(index ===0)
+                {
+                    document.getElementById("keywords").innerHTML += "<i>score : " +   score + "</i>" + "\n";
+                }
+                highlightTextInsideDiv(keyMessages);
+
+                var productId = objJSON['KeyMessages'].length - 1;
+                var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('KeyMessages',${productId})">Edit</button>`;
+                var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
+
+                document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK +  buttonEDIT_KEYMESSAGE + "\n";
+                document.getElementById('keywordsM').style.display = 'block';
+            });
+            /*#########################KEY MESSAGES#########################*/
+            
+            /*##########################Follow Ups##########################*/
+            var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
+            objFollowUps.forEach((objFollowUp) => {
+                followup = objFollowUp.entity;
+                objJSON['FollowUps'].push(followup);
+                console.log(`followup : datetime`);
+                console.log(objFollowUp);
+                highlightTextInsideDiv(followup);
+
+                 var productId = objJSON['FollowUps'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                document.getElementById("followup").innerHTML +=  "\t" + buttonOK +  buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById('followupM').style.display = 'block';
+            });
+            var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
+            objFollowUps.forEach((objFollowUp) => {
+                followup = objFollowUp.entity;
+                objJSON['FollowUps'].push(followup);
+                console.log(`followup : daterange`);
+                console.log(objFollowUp);
+                highlightTextInsideDiv(followup);
+
+               var productId = objJSON['FollowUps'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
+                document.getElementById('followupM').style.display = 'block';
+            });
+            var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
+            objFollowUps.forEach((objFollowUp) => {
+                followup = objFollowUp.entity;
+                objJSON['FollowUps'].push(followup);
+                console.log(`followup : date`);
+                console.log(objFollowUp);
+                highlightTextInsideDiv(followup);
+
+                 var productId = objJSON['FollowUps'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+
+                 document.getElementById("followup").innerHTML += followup  + "\t" + buttonOK +  buttonEDIT_FOLLOWUP  + "<br />";
+               document.getElementById('followupM').style.display = 'block';
+            });
+            /*##########################FOLLOW UPS##########################*/
+
+            /*##########################HIGHLIGHT PredefinedTags##########################*/
+            highlightPredefinedTags(arrPredefinedTags);
+            /*##########################HIGHLIGHT PredefinedTags##########################*/
+
+            /*##########################SHOW SAVE BUTTON##########################*/
+            document.getElementById('dvSave').style.display = "block";
+            document.getElementById('dvCancel').style.display = "block";
+            /*##########################SHOW SAVE BUTTON##########################*/
+            
+        } 
+        else {
+            objJSON = {};
+
+            document.getElementById("product").style.display = "none";
+            document.getElementById('keywordsM').style.display = 'none';
+            document.getElementById('followupM').style.display = 'none';
+            
+            document.getElementById('dvSave').style.display = "none";
+            document.getElementById('dvCancel').style.display = "none";
+        }
+    }
+    // }
+}
+
+//Object Extraction using key
+function findObjectByKey(array, key, value) {
+    var ArrobjectByKey = [];
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            ArrobjectByKey.push(array[i]);
+        }
+    }
+    return ArrobjectByKey;
+}
+
+// To highlight text inside the specified div using particular color 
+function highlightTextInsideDiv(text) {
+    var inputText = document.getElementById("phraseDiv");
+    var innerHTML = inputText.innerHTML;
+    var index = innerHTML.indexOf(text); //For Lowercase only
+       
+    if (index >= 0) { 
+        innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+        inputText.innerHTML = innerHTML;
+    }
+    else { //For Camelcase i.e First Character is in Upper Case
+        var capitalizeFirstLetter = text.charAt(0).toUpperCase() + text.slice(1);
+        var newIndex = innerHTML.indexOf(capitalizeFirstLetter);
+
+      if (newIndex >= 0) { 
+        innerHTML = innerHTML.substring(0,newIndex) + "<span class='highlight'>" + innerHTML.substring(newIndex,newIndex+capitalizeFirstLetter.length) + "</span>" + innerHTML.substring(newIndex + capitalizeFirstLetter.length);
+        inputText.innerHTML = innerHTML;
+        }
+    }
+}
+
+// To highlight text inside the specified div using particular color 
+function highlightPredefinedTags(a_arrPredefinedTags) {
+
+    a_arrPredefinedTags.forEach((predefinedTag)=>{
+
+        var inputText = document.getElementById("productName");
+        var innerHTML = inputText.innerHTML;
+        var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+            
+        if (index >= 0) { 
+            innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+            inputText.innerHTML = innerHTML;
+        }
+
+        var inputText = document.getElementById("keywords");
+        var innerHTML = inputText.innerHTML;
+        var index = innerHTML.indexOf(predefinedTag); //For Lowercase only
+            
+        if (index >= 0) { 
+            innerHTML = innerHTML.substring(0,index) + "<span class='highlight-pre'>" + innerHTML.substring(index,index+predefinedTag.length) + "</span>" + innerHTML.substring(index + predefinedTag.length);
+            inputText.innerHTML = innerHTML;
+        }
+    });
+}
+
+// To open Edit Popup  
+function openPopup(a_type,a_id) {
+
+    type = a_type;
+    id = a_id;
+
+    el = document.getElementById("overlay");
+    el.style.visibility =  "visible";
+
+    var input = document.getElementById("result");
+    input.value = objJSON[type][id];
+
+    document.getElementById("change").innerHTML = objJSON[type][id];
+}
+
+// To close Edit Popup  
+function closePopup() {    
+    type = '';
+    id = '';
+
+    el = document.getElementById("overlay");
+    el.style.visibility = "hidden";
+}
+
+// To save changes in objJSON          
+function saveChanges(){
+    if(type != '' || id != '')
+    {
+        var input = document.getElementById("result");
+        objJSON[type][id] = input.value;
+
+        document.getElementById("change").innerHTML = objJSON[type][id];
+        //closePopup();
+    }
+}
+
+// To submit results for LUIS processing
+function submitToLUIS(){
+    editBtn.disabled = false;
+    document.getElementById("phraseTextArea").style.display = 'none';
+
+    phraseDiv.innerHTML = phraseTextArea.value;
+    
+    document.getElementById("productName").innerHTML = "";
+    document.getElementById("keywords").innerHTML = "";
+    document.getElementById("followup").innerHTML = "";
+
+    document.getElementById("product").style.display = "none";
+    document.getElementById('keywordsM').style.display = 'none';
+    document.getElementById('followupM').style.display = 'none';
+
+    extractInLUIS(phraseDiv.innerHTML); //Send phrase to LUIS for intent/entity extraction.
+}
+
+// To edit result before Submission
+function  editResult(){ 
+    document.getElementById("phraseTextArea").style.display = 'block';
+
+    editBtn.disabled = true;
+
+    document.getElementById('dvSave').style.display = "none";
+    document.getElementById('dvCancel').style.display = "none";
+}
+
+// To save result in db
+function  saveResult(){ 
+    document.getElementById("phraseTextArea").style.display = 'block';
+
+    editBtn.disabled = true;
+}
+
+// To clear result
+function  clearResult(){
+    
+    hypothesisDiv.innerHTML = "";
+    phraseDiv.innerHTML = "";
+
+    document.getElementById("dvSubmit").style.display = "none";
+    document.getElementById('dvEdit').style.display = "none";
+    document.getElementById('dvSave').style.display = "none";
+    document.getElementById('dvCancel').style.display = "none";
+
+    document.getElementById("productName").innerHTML = "";
+    document.getElementById("keywords").innerHTML = "";
+    document.getElementById("followup").innerHTML = "";
+
+    document.getElementById("product").style.display = "none";
+    document.getElementById('keywordsM').style.display = 'none';
+    document.getElementById('followupM').style.display = 'none';
+
+}
