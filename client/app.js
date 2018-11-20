@@ -473,3 +473,8 @@ function clearResult() {
     document.getElementById('followupM').style.display = 'none';
 
 }
+
+// To navigate user to Moderator view 
+function navigateToModeraterView() {
+    window.location.href = 'http://localhost:4200/'
+}
