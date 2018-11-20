@@ -4,16 +4,10 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
+const app = express();
+
 var config = require('./config')
-
-//Initialize express app
-var app = express();
-
-//Port number
-var port = process.env.PORT || 5000
-
-//Enable logging using morgan
-app.use(morgan('dev'));
+const noteRoute = require('./api/routes/noteRoute');
 
 //Connect to Database
 mongoose.connect(config.mongoURI, {
@@ -25,7 +19,47 @@ mongoose.connect(config.mongoURI, {
 });
 mongoose.Promise = global.Promise;
 
-//Start express server on specified port
-app.listen(port, () => {
-  console.log(`Server is listening on port: ${port}`);
+//Middlewares
+app.use(morgan('dev')); // Logging
+app.use(bodyParser.urlencoded({ // Body Parser
+  extended: false
+}));
+app.use(bodyParser.json());
+
+//Cross Origin Resource Scripting
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    return res.status(200).json({});
+  }
+  next();
 });
+
+// Routes which should handle requests
+app.use("/notes", noteRoute);
+
+app.get('*', (req, res) => {
+  res.send('Hello');
+});
+
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  res.json({
+    error: {
+      message: error.message
+    }
+  });
+});
+
+module.exports = app;
