@@ -17,7 +17,7 @@ var noteSchema = new Schema({
     type: Boolean,
     value: false
   },
-  entities: [{
+  entities: {
     products: [{
       before: String,
       after: String,
@@ -45,7 +45,7 @@ var noteSchema = new Schema({
       },
       status: String,
     }]
-  }],
+  },
   is_active: {
     type: Boolean,
     value: true

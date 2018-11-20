@@ -9,11 +9,10 @@ exports.notes_get_all = (req, res, next) => {
       created_at: -1
     })
     .then(notes => {
-      resp.status(200).json({
+      res.status(200).json({
         success: true,
-        message: 'List of notes',
+        message: 'List of Notes fetched successfully',
         payload: notes
-        //"status": "string",
       });
     })
     .catch(err => {
@@ -21,7 +20,6 @@ exports.notes_get_all = (req, res, next) => {
       res.status(500).json({
         success: false,
         message: err
-        //"status": "string",
       });
     });
 };
@@ -42,7 +40,6 @@ exports.notes_create_note = (req, res, next) => {
         success: true,
         message: 'Note created successfully',
         payload: result
-        //"status": "string",
       });
     })
     .catch(err => {
@@ -50,7 +47,6 @@ exports.notes_create_note = (req, res, next) => {
       res.status(500).json({
         success: false,
         message: err
-        //"status": "string",
       });
     });
 };
@@ -60,17 +56,17 @@ exports.notes_get_note = (req, res, next) => {
   Note.findById(id)
     .then(note => {
       if (note) {
-        resp.status(200).json({
+        res.status(200).json({
           success: true,
-          message: 'Note found for provided ID',
+          message: 'A Note fetched successfully',
           payload: note
-          //"status": "string",
+
         });
       } else {
-        resp.status(404).json({
-          success: false,
-          message: "No valid entry found for provided ID"
-          //"status": "string",
+        res.status(404).json({
+          success: true,
+          message: "No valid entry found for provided noteId"
+
         });
       }
     })
@@ -79,51 +75,92 @@ exports.notes_get_note = (req, res, next) => {
       res.status(500).json({
         success: false,
         message: err
-        //"status": "string",
       });
     });
 };
 
 exports.notes_updates_note = (req, res, next) => {
   const id = req.params.noteId;
-  Note.update({
-      _id: id
-    })
+  const updateOps = {
+    is_transcript_approve: req.body.is_transcript_approve
+  };
+
+  Note.findById(id)
     .then(note => {
-      res.status(200).json({
-        success: true,
-        message: "Note updated successfully",
-        payload: note
-        //"status": "string",
-      });
+      if (note) {
+        Note.update({
+            _id: id
+          }, {
+            $set: updateOps
+          })
+          .then(note => {
+            res.status(200).json({
+              success: true,
+              message: "Note updated successfully",
+              payload: note
+
+            });
+          })
+          .catch(err => {
+            res.status(500).json({
+              success: false,
+              message: err
+
+            });
+          });
+      } else {
+        res.status(404).json({
+          success: true,
+          message: "No valid entry found for provided noteId"
+
+        });
+      }
     })
     .catch(err => {
+      console.log(err);
       res.status(500).json({
         success: false,
         message: err
-        //"status": "string",
       });
     });
 };
 
 exports.notes_deletes_note = (req, res, next) => {
   const id = req.params.noteId;
-  Product.remove({
-      _id: id
-    })
-    .exec()
-    .then(result => {
-      res.status(200).json({
-        success: true,
-        message: "Note deleted successfully",
-        payload: id
-      });
+
+  Note.findById(id)
+    .then(note => {
+      if (note) {
+        Note.remove({
+            _id: id
+          })
+          .then(result => {
+            res.status(200).json({
+              success: true,
+              message: "Note deleted successfully",
+              payload: id
+            });
+          })
+          .catch(err => {
+            res.status(500).json({
+              success: false,
+              message: err
+
+            });
+          });
+      } else {
+        res.status(404).json({
+          success: true,
+          message: "No valid entry found for provided noteId"
+
+        });
+      }
     })
     .catch(err => {
+      console.log(err);
       res.status(500).json({
         success: false,
         message: err
-        //"status": "string",
       });
     });
 };
