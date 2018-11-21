@@ -27,6 +27,7 @@ exports.notes_get_all = (req, res, next) => {
 exports.notes_create_note = (req, res, next) => {
   const note = new Note({
     _id: new mongoose.Types.ObjectId(),
+    machine_transcript: req.body.machine_transcript,
     transcripts: req.body.transcripts,
     is_transcript_approve: req.body.is_transcript_approve,
     entities: req.body.entities

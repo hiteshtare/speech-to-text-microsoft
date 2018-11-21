@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 
 var noteSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
+  machine_transcript: String,
   transcripts: [{
     before: String,
     after: String,

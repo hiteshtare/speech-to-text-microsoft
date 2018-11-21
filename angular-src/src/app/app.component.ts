@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Moderator Screen';
+
+  constructor() {
+
+  }
+
+  navigateToAssitantView() {
+    window.location.href = 'http://127.0.0.1:6060/';
+  }
 }

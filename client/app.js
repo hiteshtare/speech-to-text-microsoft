@@ -15,6 +15,21 @@ var id = '';
 
 var arrPredefinedTags = ['plavix', 'efficacy'];
 
+//JSON object to pass to API
+var objJSON = {};
+var objNote = {};
+objNote = {
+    'machine_transcript': [],
+    'transcripts': [],
+    'is_transcript_approve': false,
+    'entities': {
+        'products': [],
+        'keymessages': [],
+        'followups': []
+    }
+};
+
+
 document.addEventListener("DOMContentLoaded", function () {
     createBtn = document.getElementById("createBtn");
     startBtn = document.getElementById("startBtn");
@@ -55,6 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
             previousSubscriptionKey = key_value;
             Setup();
         }
+
+        document.getElementById('success').style.display = "none";
+        document.getElementById("phraseTextArea").style.display = 'none';
 
         hypothesisDiv.innerHTML = "";
         phraseDiv.innerHTML = "";
@@ -166,18 +184,20 @@ function UpdateRecognizedPhrase(json) {
 function OnComplete() {
     startBtn.disabled = false;
     stopBtn.disabled = true;
+    editBtn.disabled = false;
 
-    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+    phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
     if (phraseDiv.innerHTML) {
+
+        objNote["machine_transcript"] = phraseDiv.innerHTML;
+
         document.getElementById("dvSubmit").style.display = "block";
         document.getElementById('dvEdit').style.display = "block";
         phraseTextArea.value = phraseDiv.innerHTML;
     }
 }
-
-var objJSON = {};
 
 //Intent/Entity Extraction using LUIS
 function extractInLUIS(phrase) {
@@ -205,17 +225,29 @@ function extractInLUIS(phrase) {
         console.log(`token.entities.length`);
         console.log(token.entities.length);
         if (token.entities.length > 0) {
-            objJSON['Products'] = [];
-            objJSON['KeyMessages'] = [];
-            objJSON['FollowUps'] = [];
+            objJSON['products'] = [];
+            objJSON['keymessages'] = [];
+            objJSON['followups'] = [];
 
-            var buttonOK = `Approval: <input type="radio" name="approve" value="yes"> Yes  <input type="radio" name="approve" value="no"> No | `;
+            // var buttonOK = `Approval: <input type="radio" name="approve" value="yes"> Yes  <input type="radio" name="approve" value="no"> No | `;
+            var buttonOK = ``;
 
             /*############################PRODUCT############################*/
             var objProducts = findObjectByKey(token.entities, "type", "brand");
             objProducts.forEach((objProduct, index) => {
                 productName = objProduct.entity;
-                objJSON['Products'].push(productName);
+                objJSON['products'].push(productName);
+
+                /*==========================object_product==========================*/
+                object_product = {
+                    "before": productName,
+                    "after": null,
+                    "is_approve": null,
+                    "status": null
+                };
+                objNote['entities']['products'].push(object_product);
+                /*==========================object_product==========================*/
+
                 score = objProduct.score;
                 console.log(`objProduct`);
                 console.log(objProduct);
@@ -225,9 +257,9 @@ function extractInLUIS(phrase) {
                 }
                 highlightTextInsideDiv(productName);
 
-                var productId = objJSON['Products'].length - 1;
-                var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('Products',${productId})">Edit</button>`;
-                var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('Products',${productId})">Show</button>`;
+                var productId = objJSON['products'].length - 1;
+                var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('products',${productId})">Edit</button>`;
+                var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('products',${productId})">Show</button>`;
 
                 document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT + "\n";
                 document.getElementById('product').style.display = 'block';
@@ -238,7 +270,18 @@ function extractInLUIS(phrase) {
             var objKeyMessages = findObjectByKey(token.entities, "type", "keymessages")
             objKeyMessages.forEach((objKeyMessage, index) => {
                 keyMessages = objKeyMessage.entity;
-                objJSON['KeyMessages'].push(keyMessages);
+                objJSON['keymessages'].push(keyMessages);
+
+                /*==========================object_keymessage==========================*/
+                object_keymessage = {
+                    "before": keyMessages,
+                    "after": null,
+                    "is_approve": null,
+                    "status": null
+                };
+                objNote['entities']['keymessages'].push(object_keymessage);
+                /*==========================object_keymessage==========================*/
+
                 score = objKeyMessage.score;
                 console.log(`objKeyMessage`);
                 console.log(objKeyMessage);
@@ -247,9 +290,9 @@ function extractInLUIS(phrase) {
                 }
                 highlightTextInsideDiv(keyMessages);
 
-                var productId = objJSON['KeyMessages'].length - 1;
-                var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('KeyMessages',${productId})">Edit</button>`;
-                var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('KeyMessages',${productId})">Show</button>`;
+                var productId = objJSON['keymessages'].length - 1;
+                var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('keymessages',${productId})">Edit</button>`;
+                var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('keymessages',${productId})">Show</button>`;
 
                 document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK + buttonEDIT_KEYMESSAGE + "\n";
                 document.getElementById('keywordsM').style.display = 'block';
@@ -260,14 +303,26 @@ function extractInLUIS(phrase) {
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.datetime")
             objFollowUps.forEach((objFollowUp) => {
                 followup = objFollowUp.entity;
-                objJSON['FollowUps'].push(followup);
+                objJSON['followups'].push(followup);
+
+                /*==========================object_followup==========================*/
+                object_followup = {
+                    "before": followup,
+                    "after": null,
+                    "is_approve": null,
+                    "status": null
+                };
+                objNote['entities']['followups'].push(object_followup);
+                /*==========================object_followup==========================*/
+
+
                 console.log(`followup : datetime`);
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-                var productId = objJSON['FollowUps'].length - 1;
-                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                var productId = objJSON['followups'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
                 document.getElementById("followup").innerHTML += "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
                 document.getElementById('followupM').style.display = 'block';
@@ -275,14 +330,25 @@ function extractInLUIS(phrase) {
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
             objFollowUps.forEach((objFollowUp) => {
                 followup = objFollowUp.entity;
-                objJSON['FollowUps'].push(followup);
+                objJSON['followups'].push(followup);
+
+                /*==========================object_followup==========================*/
+                object_followup = {
+                    "before": followup,
+                    "after": null,
+                    "is_approve": null,
+                    "status": null
+                };
+                objNote['entities']['followups'].push(object_followup);
+                /*==========================object_followup==========================*/
+
                 console.log(`followup : daterange`);
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-                var productId = objJSON['FollowUps'].length - 1;
-                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                var productId = objJSON['followups'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
                 document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
                 document.getElementById('followupM').style.display = 'block';
@@ -290,14 +356,25 @@ function extractInLUIS(phrase) {
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
             objFollowUps.forEach((objFollowUp) => {
                 followup = objFollowUp.entity;
-                objJSON['FollowUps'].push(followup);
+                objJSON['followups'].push(followup);
+
+                /*==========================object_followup==========================*/
+                object_followup = {
+                    "before": followup,
+                    "after": null,
+                    "is_approve": null,
+                    "status": null
+                };
+                objNote['entities']['followups'].push(object_followup);
+                /*==========================object_followup==========================*/
+
                 console.log(`followup : date`);
                 console.log(objFollowUp);
                 highlightTextInsideDiv(followup);
 
-                var productId = objJSON['FollowUps'].length - 1;
-                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('FollowUps',${productId})">Edit</button>`;
-                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('FollowUps',${productId})">Show</button>`;
+                var productId = objJSON['followups'].length - 1;
+                var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
+                var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
                 document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
                 document.getElementById('followupM').style.display = 'block';
@@ -393,9 +470,17 @@ function openPopup(a_type, a_id) {
     el.style.visibility = "visible";
 
     var input = document.getElementById("result");
-    input.value = objJSON[type][id];
 
-    document.getElementById("change").innerHTML = objJSON[type][id];
+    let current_value = '';
+    if (objNote['entities'][type][id]["after"]) {
+        current_value = objNote['entities'][type][id]["after"];
+    } else {
+        current_value = objNote['entities'][type][id]["before"];
+    }
+
+    input.value = current_value;
+
+    document.getElementById("change").innerHTML = current_value;
 }
 
 // To close Edit Popup  
@@ -411,9 +496,12 @@ function closePopup() {
 function saveChanges() {
     if (type != '' || id != '') {
         var input = document.getElementById("result");
-        objJSON[type][id] = input.value;
+        objNote['entities'][type][id]["after"] = input.value;
 
-        document.getElementById("change").innerHTML = objJSON[type][id];
+        objNote['entities'][type][id]["is_approve"] = false;
+        objNote['entities'][type][id]["status"] = "pending for Moderator Approval";
+
+        document.getElementById("change").innerHTML = objNote['entities'][type][id]["after"];
         //closePopup();
     }
 }
@@ -438,6 +526,8 @@ function submitToLUIS() {
 
 // To edit result before Submission
 function editResult() {
+
+
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
@@ -451,6 +541,62 @@ function saveResult() {
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
+
+    // var objNote = {
+    //     "machine_transcript": "Would you please provide with the details about Plavix or Xarelto, and also its side effects or any efficacy study by today or tomorrow or Sunday",
+    //     "transcripts": [{
+    //             "before": "plastics",
+    //             "after": "plavix"
+    //         },
+    //         {
+    //             "before": "lyrics",
+    //             "after": "clinic"
+    //         }
+    //     ],
+    //     "is_transcript_approve": "false",
+    //     "entities": {
+    //         "products": [{
+    //                 "before": "plastics",
+    //                 "after": "plavix"
+    //             },
+    //             {
+    //                 "before": "lyrics",
+    //                 "after": "clinic"
+    //             }
+    //         ],
+    //         "keymessages": [{
+    //                 "before": "effects",
+    //                 "after": "efficacy"
+    //             },
+    //             {
+    //                 "before": "care",
+    //                 "after": "cure"
+    //             }
+    //         ],
+    //         "followups": [{
+    //                 "before": "Tuesday",
+    //                 "after": "Thursday"
+    //             },
+    //             {
+    //                 "before": "7 Sunday",
+    //                 "after": "7th of Sunday"
+    //             }
+    //         ]
+    //     }
+    // };
+
+    var xhr = new XMLHttpRequest();
+    var url = "http://localhost:5000/notes";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.status === 201) {
+            document.getElementById('success').style.display = "block";
+            clearResult();
+        }
+    };
+    var data = JSON.stringify(objNote);
+    xhr.send(data);
 }
 
 // To clear result
@@ -459,10 +605,13 @@ function clearResult() {
     hypothesisDiv.innerHTML = "";
     phraseDiv.innerHTML = "";
 
+    document.getElementById("phraseTextArea").style.display = 'none';
+
     document.getElementById("dvSubmit").style.display = "none";
     document.getElementById('dvEdit').style.display = "none";
     document.getElementById('dvSave').style.display = "none";
     document.getElementById('dvCancel').style.display = "none";
+
 
     document.getElementById("productName").innerHTML = "";
     document.getElementById("keywords").innerHTML = "";
