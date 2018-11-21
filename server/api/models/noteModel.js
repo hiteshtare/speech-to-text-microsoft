@@ -37,7 +37,7 @@ var noteSchema = new Schema({
       },
       status: String,
     }],
-    followup: [{
+    followups: [{
       before: String,
       after: String,
       is_approve: {

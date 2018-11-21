@@ -228,6 +228,9 @@ function extractInLUIS(phrase) {
             objJSON['products'] = [];
             objJSON['keymessages'] = [];
             objJSON['followups'] = [];
+            objNote['entities']['products'] = [];
+            objNote['entities']['keymessages'] = [];
+            objNote['entities']['followups'] = [];
 
             // var buttonOK = `Approval: <input type="radio" name="approve" value="yes"> Yes  <input type="radio" name="approve" value="no"> No | `;
             var buttonOK = ``;

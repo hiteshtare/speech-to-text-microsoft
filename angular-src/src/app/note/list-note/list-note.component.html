@@ -29,43 +29,153 @@
 </p-table>
 
 <p-dialog header="Approval Dialog" [(visible)]="display" [modal]="true" [responsive]="true" [width]="500" [minWidth]="350"
-  [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  [minY]="70" [maximizable]="true" [baseZIndex]="10000" closeOnEscape="true">
   <ng-container *ngIf="tempnote">
     <ng-container *ngIf="tempnote['entities']['products']">
-      <span>{{tempnote['entities']['products'].length}}</span>
-
+      <!-- <form [formGroup]='form' (submit)='submit(form.value)'>
+        {{skills.controls | json}}
+        <div *ngFor='let skill of skills.controls; let i=index'>
+          <input type='checkbox' [formControl]='skill' /> {{skills.before}}
+        </div>
+        <button type='submit'>Submit</button>
+      </form> -->
       <p-panel header="Products">
         <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: 10px 0px">
           <div class="ui-grid-row">
             <div class="ui-grid-col-4">
-              Before
+              <h3>Before</h3>
             </div>
             <div class="ui-grid-col-4">
-              After
+              <h3>After</h3>
             </div>
             <div class="ui-grid-col-4">
-              Action
+              <h3>Approve</h3>
             </div>
           </div>
-          <ng-container *ngFor="let product of tempnote['entities']['products']">
-            <div class="ui-grid-row">
-              <div class="ui-grid-col-4">
-                {{product.before}}
+          <ng-container *ngFor="let product of tempnote['entities']['products']; let i = index">
+            <ng-container *ngIf="product.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{product.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{product.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  <p-inputSwitch [(ngModel)]="tempnote['entities']['products'][i].is_approve"></p-inputSwitch>
+                </div>
               </div>
-              <div class="ui-grid-col-4">
-                {{product.after}}
+            </ng-container>
+            <ng-container *ngIf="!product.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{product.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{product.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  &nbsp;
+                </div>
               </div>
-              <div class="ui-grid-col-4">
-                <p-inputSwitch [(ngModel)]="checked1"></p-inputSwitch>
-              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </p-panel>
+    </ng-container>
+    <ng-container *ngIf="tempnote['entities']['keymessages']">
+      <p-panel header="Key Messages">
+        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: 10px 0px">
+          <div class="ui-grid-row">
+            <div class="ui-grid-col-4">
+              <h3>Before</h3>
             </div>
+            <div class="ui-grid-col-4">
+              <h3>After</h3>
+            </div>
+            <div class="ui-grid-col-4">
+              <h3>Approve</h3>
+            </div>
+          </div>
+          <ng-container *ngFor="let keymessage of tempnote['entities']['keymessages']">
+            <ng-container *ngIf="keymessage.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{keymessage.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{keymessage.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  <p-inputSwitch [(ngModel)]="checked1"></p-inputSwitch>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!keymessage.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{keymessage.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{keymessage.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  &nbsp;
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </p-panel>
+    </ng-container>
+    <ng-container *ngIf="tempnote['entities']['followups']">
+      <p-panel header="Follow Ups">
+        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: 10px 0px">
+          <div class="ui-grid-row">
+            <div class="ui-grid-col-4">
+              <h3>Before</h3>
+            </div>
+            <div class="ui-grid-col-4">
+              <h3>After</h3>
+            </div>
+            <div class="ui-grid-col-4">
+              <h3>Approve</h3>
+            </div>
+          </div>
+          <ng-container *ngFor="let followup of tempnote['entities']['followups']">
+            <ng-container *ngIf="followup.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{followup.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{followup.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  <p-inputSwitch [(ngModel)]="checked1"></p-inputSwitch>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!followup.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  {{followup.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{followup.after}}
+                </div>
+                <div class="ui-grid-col-4">
+                  &nbsp;
+                </div>
+              </div>
+            </ng-container>
           </ng-container>
         </div>
       </p-panel>
     </ng-container>
   </ng-container>
   <p-footer>
-    <button type="button" pButton icon="pi pi-check" (click)="display=false" label="Yes"></button>
+    <button type="button" pButton icon="pi pi-check" (click)="saveNote()" label="Yes"></button>
     <button type="button" pButton icon="pi pi-close" (click)="display=false" label="No" class="ui-button-secondary"></button>
   </p-footer>
 </p-dialog>

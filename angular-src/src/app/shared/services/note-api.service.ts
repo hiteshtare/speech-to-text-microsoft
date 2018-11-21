@@ -27,4 +27,10 @@ export class NoteApiService {
       return data;
     }));
   }
+
+  saveNote(note: Note): Observable<Response> {
+    return this.http.put(`${this.notesApiUrl}/notes/${note._id}`, note).pipe(map((data: Response) => {
+      return data;
+    }));
+  }
 }

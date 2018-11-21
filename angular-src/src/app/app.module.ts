@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ListNoteComponent } from './note/list-note/list-note.component';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // PrimeNG Modules
 import { TableModule } from 'primeng/table';
@@ -14,7 +15,9 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { PanelModule } from 'primeng/panel';
 import { InputSwitchModule } from 'primeng/inputswitch';
-import { FormsModule } from '@angular/forms';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/components/common/messageservice';
+import { CustomToastService } from './shared/services/custom-toast.service';
 // PrimeNG Modules
 
 @NgModule({
@@ -28,13 +31,15 @@ import { FormsModule } from '@angular/forms';
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     TableModule,
     ButtonModule,
     DialogModule,
     InputSwitchModule,
-    PanelModule
+    PanelModule,
+    ToastModule
   ],
-  providers: [NoteApiService],
+  providers: [NoteApiService, MessageService, CustomToastService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

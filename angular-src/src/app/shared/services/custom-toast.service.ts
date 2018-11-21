@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @Injectable()
 export class CustomToastService {
 
-  // constructor(public snackBar: MatSnackBar) {
-  // }
+  constructor(private messageService: MessageService) {
+  }
 
-  // toastMessage(message: string, action: string) {
-  //   this.snackBar.open(message, action, {
-  //     duration: 2000,
-  //   });
-  // }
+  toastMessage(p_severity: string, p_summary: string, p_detail: string) {
+    this.messageService.add({
+      life: 2000, severity: p_severity, summary: p_summary, detail: p_detail
+    });
+  }
 }

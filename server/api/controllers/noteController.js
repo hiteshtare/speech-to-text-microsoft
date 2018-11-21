@@ -83,7 +83,9 @@ exports.notes_get_note = (req, res, next) => {
 exports.notes_updates_note = (req, res, next) => {
   const id = req.params.noteId;
   const updateOps = {
-    is_transcript_approve: req.body.is_transcript_approve
+    transcripts: req.body.transcripts,
+    is_transcript_approve: req.body.is_transcript_approve,
+    entities: req.body.entities
   };
 
   Note.findById(id)
