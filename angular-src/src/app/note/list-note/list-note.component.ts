@@ -34,6 +34,24 @@ export class ListNoteComponent implements OnInit {
   }
 
   saveNote() {
+
+
+    this.tempnote['entities']['products'].forEach((product) => {
+      if (product.is_approve === true) {
+        product.status = 'Pending for LUIS training';
+      }
+    });
+    this.tempnote['entities']['keymessages'].forEach((product) => {
+      if (product.is_approve === true) {
+        product.status = 'Pending for LUIS training';
+      }
+    });
+    this.tempnote['entities']['followups'].forEach((product) => {
+      if (product.is_approve === true) {
+        product.status = 'Pending for LUIS training';
+      }
+    });
+
     this.noteApiService.saveNote(this.tempnote).subscribe((data) => {
       if (data['success'] === true) {
         this.display = false;

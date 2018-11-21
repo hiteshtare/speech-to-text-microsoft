@@ -186,8 +186,8 @@ function OnComplete() {
     stopBtn.disabled = true;
     editBtn.disabled = false;
 
-    phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-    and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
     if (phraseDiv.innerHTML) {
 
