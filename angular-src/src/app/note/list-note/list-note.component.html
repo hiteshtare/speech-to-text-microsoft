@@ -7,8 +7,8 @@
       <th>Id</th>
       <th>Machine Transcript</th>
       <!-- <th>Transcript - Rep Edits</th> -->
-      <th>Approval - Transcript </th>
-      <!-- <th>Entities - Rep Edits</th> -->
+      <!-- <th>Approval - Transcript </th> -->
+      <th>Entities - Rep Edits</th>
       <th>Action</th>
     </tr>
   </ng-template>
@@ -17,8 +17,62 @@
       <td>{{note._id}}</td>
       <td>{{note.machine_transcript}}</td>
       <!-- <td>{{note.transcripts | json}}</td> -->
-      <td>{{note.is_transcript_approve}}</td>
-      <!-- <td>{{note.entities | json}}</td> -->
+      <!-- <td>{{note.is_transcript_approve}}</td> -->
+      <td>
+        <ng-container *ngIf="note['entities']['products']">
+
+          <ng-container *ngFor="let product of note['entities']['products']; let i = index">
+            <ng-container *ngIf="product.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  <h4>Product</h4>
+                </div>
+                <div class="ui-grid-col-4">
+                  {{product.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{product.after}}
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+        </ng-container>
+        <ng-container *ngIf="note['entities']['keymessages']">
+          <ng-container *ngFor="let keymessage of note['entities']['keymessages']">
+            <ng-container *ngIf="keymessage.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  <h4>Key Message</h4>
+                </div>
+                <div class="ui-grid-col-4">
+                  {{keymessage.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{keymessage.after}}
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="note['entities']['followups']">
+          <ng-container *ngFor="let followup of note['entities']['followups']">
+            <ng-container *ngIf="followup.after">
+              <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                  <h4>Follow Up</h4>
+                </div>
+                <div class="ui-grid-col-4">
+                  {{followup.before}}
+                </div>
+                <div class="ui-grid-col-4">
+                  {{followup.after}}
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </td>
       <td>
         <button type="button" (click)="showDialog(note)" pButton icon="pi pi-info-circle" label="Show"></button></td>
     </tr>
@@ -32,13 +86,6 @@
   [minY]="70" [maximizable]="true" [baseZIndex]="10000" closeOnEscape="true">
   <ng-container *ngIf="tempnote">
     <ng-container *ngIf="tempnote['entities']['products']">
-      <!-- <form [formGroup]='form' (submit)='submit(form.value)'>
-        {{skills.controls | json}}
-        <div *ngFor='let skill of skills.controls; let i=index'>
-          <input type='checkbox' [formControl]='skill' /> {{skills.before}}
-        </div>
-        <button type='submit'>Submit</button>
-      </form> -->
       <p-panel header="Products">
         <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: 10px 0px">
           <div class="ui-grid-row">
@@ -97,8 +144,9 @@
               <h3>Approve</h3>
             </div>
           </div>
-          <ng-container *ngFor="let keymessage of tempnote['entities']['keymessages']">
-            <ng-container *ngIf="keymessage.after">
+          <ng-container *ngFor="let keymessage of tempnote['entities']['keymessages']; let i = index">
+            <ng-container *ngIf="
+            keymessage.after">
               <div class="ui-grid-row">
                 <div class="ui-grid-col-4">
                   {{keymessage.before}}
@@ -107,7 +155,7 @@
                   {{keymessage.after}}
                 </div>
                 <div class="ui-grid-col-4">
-                  <p-inputSwitch [(ngModel)]="checked1"></p-inputSwitch>
+                  <p-inputSwitch [(ngModel)]="tempnote['entities']['keymessages'][i].is_approve"></p-inputSwitch>
                 </div>
               </div>
             </ng-container>
@@ -142,8 +190,9 @@
               <h3>Approve</h3>
             </div>
           </div>
-          <ng-container *ngFor="let followup of tempnote['entities']['followups']">
-            <ng-container *ngIf="followup.after">
+          <ng-container *ngFor="let followup of tempnote['entities']['followups']; let i = index">
+            <ng-container *ngIf="
+          followup.after">
               <div class="ui-grid-row">
                 <div class="ui-grid-col-4">
                   {{followup.before}}
@@ -152,7 +201,7 @@
                   {{followup.after}}
                 </div>
                 <div class="ui-grid-col-4">
-                  <p-inputSwitch [(ngModel)]="checked1"></p-inputSwitch>
+                  <p-inputSwitch [(ngModel)]="tempnote['entities']['followups'][i].is_approve"></p-inputSwitch>
                 </div>
               </div>
             </ng-container>

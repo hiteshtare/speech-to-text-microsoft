@@ -13,7 +13,6 @@ export class ListNoteComponent implements OnInit {
   notes: Note[];
   tempnote: Note;
   display = false;
-  checked1 = false;
   form;
 
   constructor(private noteApiService: NoteApiService, private customToastService: CustomToastService) {
