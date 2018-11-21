@@ -11,7 +11,9 @@ import { Component, OnInit } from '@angular/core';
 export class ListNoteComponent implements OnInit {
 
   notes: Note[];
-  displayedColumns = ['_id'];
+  tempnote: Note;
+  display = false;
+  checked1 = true;
 
   constructor(private noteApiService: NoteApiService) { }
 
@@ -25,4 +27,8 @@ export class ListNoteComponent implements OnInit {
     });
   }
 
+  showDialog(note: Note) {
+    this.tempnote = note;
+    this.display = true;
+  }
 }

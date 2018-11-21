@@ -11,6 +11,10 @@ import { HttpClientModule } from '@angular/common/http';
 // PrimeNG Modules
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { PanelModule } from 'primeng/panel';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { FormsModule } from '@angular/forms';
 // PrimeNG Modules
 
 @NgModule({
@@ -23,8 +27,12 @@ import { ButtonModule } from 'primeng/button';
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    FormsModule,
     TableModule,
-    ButtonModule
+    ButtonModule,
+    DialogModule,
+    InputSwitchModule,
+    PanelModule
   ],
   providers: [NoteApiService],
   bootstrap: [AppComponent]
