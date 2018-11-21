@@ -1,7 +1,6 @@
 import { Note } from './../../shared/models/note.model';
 import { NoteApiService } from './../../shared/services/note-api.service';
 import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
 
 
 @Component({
@@ -11,7 +10,7 @@ import { MatTableDataSource } from '@angular/material';
 })
 export class ListNoteComponent implements OnInit {
 
-  notes;
+  notes: Note[];
   displayedColumns = ['_id'];
 
   constructor(private noteApiService: NoteApiService) { }
@@ -22,7 +21,7 @@ export class ListNoteComponent implements OnInit {
 
   loadNotes() {
     this.noteApiService.getNotes().subscribe((data) => {
-      this.notes = new MatTableDataSource(data['payload']);
+      this.notes = data['payload'];
     });
   }
 
