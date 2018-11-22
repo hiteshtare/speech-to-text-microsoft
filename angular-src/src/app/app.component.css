@@ -1,0 +1,21 @@
+.feature-title {
+  font-size: 30px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.content-section.introduction {
+  background-image: linear-gradient(to left, #2bc0ec, #1b81d7);
+  color: #fff;
+}
+
+.content-section {
+  display: block;
+  padding: 30px;
+  overflow: hidden;
+  background-color: #f5f7f8;
+}
+
+button {
+  margin-right: .8em;
+}
