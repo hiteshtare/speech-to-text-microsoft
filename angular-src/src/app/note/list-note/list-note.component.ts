@@ -38,17 +38,17 @@ export class ListNoteComponent implements OnInit {
 
     this.tempnote['entities']['products'].forEach((product) => {
       if (product.is_approve === true) {
-        product.status = 'Pending for LUIS training';
+        product.status = 'pending for luis training';
       }
     });
     this.tempnote['entities']['keymessages'].forEach((product) => {
       if (product.is_approve === true) {
-        product.status = 'Pending for LUIS training';
+        product.status = 'pending for luis training';
       }
     });
     this.tempnote['entities']['followups'].forEach((product) => {
       if (product.is_approve === true) {
-        product.status = 'Pending for LUIS training';
+        product.status = 'pending for luis training';
       }
     });
 

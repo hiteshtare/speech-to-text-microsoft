@@ -502,7 +502,7 @@ function saveChanges() {
         objNote['entities'][type][id]["after"] = input.value;
 
         objNote['entities'][type][id]["is_approve"] = false;
-        objNote['entities'][type][id]["status"] = "pending for Moderator Approval";
+        objNote['entities'][type][id]["status"] = "pending for moderator approval";
 
         document.getElementById("change").innerHTML = objNote['entities'][type][id]["after"];
         //closePopup();

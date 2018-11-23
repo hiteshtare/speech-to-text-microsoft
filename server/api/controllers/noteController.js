@@ -174,18 +174,44 @@ exports.train_luis_for_entities = (req, res, next) => {
     .find({
       'entities.products': {
         $elemMatch: {
-          'is_approve': true
+          'is_approve': true,
+          'status': 'pending for luis training'
         }
       }
     }, {
       "entities.products.$": 1
     })
     .then(notes => {
-      res.status(200).json({
-        success: true,
-        message: 'List of Notes fetched successfully',
-        payload: notes
-      });
+      ///////////////////////////TRAINING LUIS///////////////////////////
+
+      ///////////////////////////TRAINING LUIS///////////////////////////
+
+      ///////////////////////////UPDATING STATUS///////////////////////////
+      updateOps = {
+        "entities.products.$.status": 'completed luis traning'
+      };
+
+      Note.update({
+          "entities.products._id": ObjectId("5bf52eec1af1ab1a49aa0b9b")
+        }, {
+          $set: updateOps
+        })
+        .then(note => {
+          res.status(200).json({
+            success: true,
+            message: "Products : LUIS training completed successfully",
+            payload: note
+
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            success: false,
+            message: err
+
+          });
+        });
+      ///////////////////////////UPDATING STATUS///////////////////////////
     })
     .catch(err => {
       console.log(err);
@@ -194,80 +220,48 @@ exports.train_luis_for_entities = (req, res, next) => {
         message: err
       });
     });
-  ///////////////////////////KEYMESSAGES///////////////////////////
-  Note
-    .find({
-      'entities.keymessages': {
-        $elemMatch: {
-          'is_approve': true
-        }
-      }
-    }, {
-      "entities.keymessages.$": 1
-    })
-    .then(notes => {
-      res.status(200).json({
-        success: true,
-        message: 'List of Notes fetched successfully',
-        payload: notes
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
-      });
-    });
-  ///////////////////////////FOLLOWUPS///////////////////////////
-  Note
-    .find({
-      'entities.followups': {
-        $elemMatch: {
-          'is_approve': true
-        }
-      }
-    }, {
-      "entities.followups.$": 1
-    })
-    .then(notes => {
-      res.status(200).json({
-        success: true,
-        message: 'List of Notes fetched successfully',
-        payload: notes
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
-      });
-    });
+  // ///////////////////////////KEYMESSAGES///////////////////////////
+  // Note
+  //   .find({
+  //     'entities.keymessages': {
+  //       $elemMatch: {
+  //         'is_approve': true,
+  //         'status': 'pending for luis training'
+  //       }
+  //     }
+  //   }, {
+  //     "entities.keymessages.$": 1
+  //   })
+  //   .then(notes => {
 
-  ///////////////////////////UPDATING DATA///////////////////////////
-  updateOps = {
-    "entities.followups.$.is_approve": false
-  };
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     res.status(500).json({
+  //       success: false,
+  //       message: err
+  //     });
+  //   });
+  // ///////////////////////////FOLLOWUPS///////////////////////////
+  // Note
+  //   .find({
+  //     'entities.followups': {
+  //       $elemMatch: {
+  //         'is_approve': true,
+  //         'status': 'pending for luis training'
+  //       }
+  //     }
+  //   }, {
+  //     "entities.followups.$": 1
+  //   })
+  //   .then(notes => {
 
-  Note.update({
-      "entities.followups._id": ObjectId("5bf52eec1af1ab1a49aa0b9b")
-    }, {
-      $set: updateOps
-    })
-    .then(note => {
-      res.status(200).json({
-        success: true,
-        message: "Note updated successfully",
-        payload: note
-
-      });
-    })
-    .catch(err => {
-      res.status(500).json({
-        success: false,
-        message: err
-
-      });
-    });
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     res.status(500).json({
+  //       success: false,
+  //       message: err
+  //     });
+  //   });
 };
