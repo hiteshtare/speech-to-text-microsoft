@@ -8,6 +8,7 @@ const app = express();
 
 var config = require('./config')
 const noteRoute = require('./api/routes/noteRoute');
+const trainingRoute = require('./api/routes/trainingRoute');
 
 //Connect to Database
 mongoose.connect(config.mongoURI, {
@@ -39,9 +40,10 @@ app.use((req, res, next) => {
   }
   next();
 });
-
 // Routes which should handle requests
 app.use("/notes", noteRoute);
+// Routes which should handle requests
+app.use("/training", trainingRoute);
 
 app.get('*', (req, res) => {
   res.send('Hello');

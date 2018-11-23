@@ -35,7 +35,7 @@ export class NoteApiService {
   }
 
   trainLUISForEntities(): Observable<Response> {
-    return this.http.get(`${this.notesApiUrl}/notes/train`).pipe(map((data: Response) => {
+    return this.http.get(`${this.notesApiUrl}/training`).pipe(map((data: Response) => {
       return data;
     }));
   }

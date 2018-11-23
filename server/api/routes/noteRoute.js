@@ -13,6 +13,4 @@ router.put("/:noteId", NoteController.notes_updates_note);
 
 router.get("/:noteId", NoteController.notes_get_note);
 
-router.get("/train", NoteController.train_luis_for_entities);
-
 module.exports = router;

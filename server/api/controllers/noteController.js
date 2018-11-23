@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Note = require("../models/noteModel");
+const request = require("request-promise")
 
 exports.notes_get_all = (req, res, next) => {
   Note
@@ -183,34 +184,60 @@ exports.train_luis_for_entities = (req, res, next) => {
     })
     .then(notes => {
       ///////////////////////////TRAINING LUIS///////////////////////////
+      const options = {
+        method: 'GET',
+        uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists/1460088',
+        headers: {
+          'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
+        }
+        // body: {
+        //   foo: 'bar'
+        // },
+        // json: true
+        // JSON stringifies the body automatically
+      };
+
+      var brand_PhraseList;
+      request(options)
+        .then(function (response) {
+          brand_PhraseList = response["phrases"];
+        })
+        .catch(function (err) {
+          // Deal with the error
+        });
+
+      brand_PhraseList;
+
+
+
 
       ///////////////////////////TRAINING LUIS///////////////////////////
 
       ///////////////////////////UPDATING STATUS///////////////////////////
-      updateOps = {
-        "entities.products.$.status": 'completed luis traning'
-      };
+      // updateOps = {
+      //   "entities.products.$.status": 'completed luis traning'
+      // };
 
-      Note.update({
-          "entities.products._id": ObjectId("5bf52eec1af1ab1a49aa0b9b")
-        }, {
-          $set: updateOps
-        })
-        .then(note => {
-          res.status(200).json({
-            success: true,
-            message: "Products : LUIS training completed successfully",
-            payload: note
+      // Note.update({
+      //     "entities.products._id": ObjectId("5bf52eec1af1ab1a49aa0b9b")
+      //   }, {
+      //     $set: updateOps
+      //   })
+      //   .then(note => {
+      //     res.status(200).json({
+      //       success: true,
+      //       message: "Products : LUIS training completed successfully",
+      //       payload: note
 
-          });
-        })
-        .catch(err => {
-          res.status(500).json({
-            success: false,
-            message: err
+      //     });
+      //   })
+      //   .catch(err => {
+      //     res.status(500).json({
+      //       success: false,
+      //       message: err
 
-          });
-        });
+      //     });
+      //   });
       ///////////////////////////UPDATING STATUS///////////////////////////
     })
     .catch(err => {
