@@ -193,10 +193,19 @@ exports.train_luis_for_entities = (req, res, next) => {
       lean: true
     })
     .then((notes) => {
-      console.log('MONGO - Product List fetched for Training');
       var arr_notes = notes; // Array of Notes
+      var arr_products; // Array of Notes
       ///////////////////////////TRAINING LUIS///////////////////////////
 
+      if (arr_notes.length == 0) {
+        console.log('MONGO - No Product List Records');
+        res.status(200).json({
+          success: true,
+          message: "No data found for LUIS trainig"
+        });
+        return;
+      }
+      console.log('MONGO - Product List fetched for Training');
       /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
       const get_options = {
         method: 'GET',
@@ -211,13 +220,13 @@ exports.train_luis_for_entities = (req, res, next) => {
           let brand_PhraseList = json_resp["phrases"];
 
           arr_notes.forEach((note) => {
-            let arr_products = note["entities"]["products"];
+            arr_products = note["entities"]["products"];
 
             arr_products.forEach((product, index) => {
               if (index == 0) {
                 console.log(`brand_PhraseList`);
               }
-              brand_PhraseList = brand_PhraseList.replace(`${product["before"]}`, '');
+              brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
               brand_PhraseList += ',' + product["after"];
               console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
             });
@@ -260,6 +269,36 @@ exports.train_luis_for_entities = (req, res, next) => {
               request(post_options)
                 .then(function (resp) {
                   console.log('POST - LUIS Trained successfully for new changes');
+
+                  /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
+                  console.log('MONGO - Updating status of Product List Trained');
+                  arr_products.forEach((product, index) => {
+                    if (index == 0) {
+                      console.log(`Updating arr_products`);
+                    }
+
+                    const id = product["_id"];
+                    const updateOps = {
+                      "entities.products.$.status": "completed luis training"
+                    };
+
+                    Note.updateOne({
+                        "entities.products._id": id
+                      }, {
+                        $set: updateOps
+                      })
+                      .then(note => {
+                        console.log(`Mongo - Updated product : ${id} successfully`);
+                      })
+                      .catch(err => {
+                        res.status(500).json({
+                          success: false,
+                          message: err
+                        });
+                      });
+                  });
+                  /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
+
                   res.status(200).json({
                     success: true,
                     message: "LUIS Trained successfully for new changes"
