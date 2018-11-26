@@ -10,6 +10,7 @@ import { Note } from '../models/note.model';
 export class NoteApiService {
 
   headers: HttpHeaders;
+  showLoader = false;
 
   // For Developement
   public notesApiUrl = 'http://localhost:5000';

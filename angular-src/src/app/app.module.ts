@@ -18,6 +18,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { CustomToastService } from './shared/services/custom-toast.service';
+import {ProgressBarModule} from 'primeng/progressbar';
 // PrimeNG Modules
 
 @NgModule({
@@ -37,7 +38,8 @@ import { CustomToastService } from './shared/services/custom-toast.service';
     DialogModule,
     InputSwitchModule,
     PanelModule,
-    ToastModule
+    ToastModule,
+    ProgressBarModule
   ],
   providers: [NoteApiService, MessageService, CustomToastService],
   bootstrap: [AppComponent]

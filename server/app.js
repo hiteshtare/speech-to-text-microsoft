@@ -11,10 +11,10 @@ const noteRoute = require('./api/routes/noteRoute');
 const trainingRoute = require('./api/routes/trainingRoute');
 
 //Connect to Database
-mongoose.connect(config.mongoURI, {
+mongoose.connect(config.mongoURI_config, {
   useNewUrlParser: true
 }).then(() => {
-  console.log(`Connected to ${config.mongoURI}`);
+  console.log(`Connected to ${config.mongoURI_config}`);
 }).catch((e) => {
   throw e;
 });

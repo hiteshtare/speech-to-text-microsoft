@@ -1,8 +1,14 @@
 <!--The content below is only a placeholder and can be replaced.-->
+<ng-container *ngIf="noteApiService.showLoader">
+  <div class="content-section loader">
+    <h3>Luis Training in Progress</h3>
+    <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+  </div>
+</ng-container>
 <div class="content-section introduction">
   <div><span class="feature-title">Moderator Screen</span></div><button pButton type="button" label="Navigate to Assistant Screen"
     class="ui-button-warning" (click)="navigateToAssitantView()"></button><button pButton type="button" label="Train LUIS"
-    class="ui-button-success" (click)="trainLUIS()"></button>
+    class="ui-button-success" (click)="trainLUIS()" [disabled]="noteApiService.showLoader"></button>
 </div>
 <router-outlet></router-outlet>
 <p-toast></p-toast>

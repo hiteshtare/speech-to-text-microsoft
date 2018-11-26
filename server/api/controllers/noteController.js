@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 const Note = require("../models/noteModel");
 const request = require("request-promise")
 
+var config = require('../../config');
+
+const luis_config = config.luis_config;
+const luis_wepApiUri = `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${luis_config.appId}/versions/${luis_config.versionId}`;
+const luis_wepApiHeaders = {
+  'Ocp-Apim-Subscription-Key': luis_config.subscriptionKey
+};
+
 exports.notes_get_all = (req, res, next) => {
   Note
     .find()
@@ -185,45 +193,41 @@ exports.train_luis_for_entities = (req, res, next) => {
       lean: true
     })
     .then((notes) => {
-      console.log('PRODUCTS LIST');
+      console.log('MONGO - Product List fetched for Training');
       var arr_notes = notes; // Array of Notes
       ///////////////////////////TRAINING LUIS///////////////////////////
 
       /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
       const get_options = {
         method: 'GET',
-        uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists/1460088',
-        headers: {
-          'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
-        }
-        // body: {
-        //   foo: 'bar'
-        // },
-        // json: true
-        // JSON stringifies the body automatically
+        uri: `${luis_wepApiUri}/phraselists/1460088`,
+        headers: luis_wepApiHeaders
       };
 
       request(get_options)
         .then(function (resp) {
-          console.log('GET FOR PHRASE LIST FEATURE ARRAY');
+          console.log('GET - Brands Array fetched');
           let json_resp = JSON.parse(resp);
           let brand_PhraseList = json_resp["phrases"];
 
           arr_notes.forEach((note) => {
-            let arr_products = notes["entities"]["products"];
+            let arr_products = note["entities"]["products"];
 
-            arr_products.forEach((product) => {
+            arr_products.forEach((product, index) => {
+              if (index == 0) {
+                console.log(`brand_PhraseList`);
+              }
+              brand_PhraseList = brand_PhraseList.replace(`${product["before"]}`, '');
               brand_PhraseList += ',' + product["after"];
+              console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
             });
           });
 
           /**********************PUT FOR PHRASE LIST FEATURE ARRAY**********************/
           const put_options = {
             method: 'PUT',
-            uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists/1460088',
-            headers: {
-              'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
-            },
+            uri: `${luis_wepApiUri}/phraselists/1460088`,
+            headers: luis_wepApiHeaders,
             body: {
               "id": 1460088,
               "name": "brand",
@@ -236,15 +240,13 @@ exports.train_luis_for_entities = (req, res, next) => {
 
           request(put_options)
             .then(function (resp) {
-              console.log('PUT FOR PHRASE LIST FEATURE ARRAY');
+              console.log('PUT - Brands Array updated');
 
               /**********************POST FOR TRAIN APPLICATION VERSION**********************/
               const post_options = {
                 method: 'POST',
-                uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/train',
-                headers: {
-                  'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
-                },
+                uri: `${luis_wepApiUri}/train`,
+                headers: luis_wepApiHeaders,
                 body: {
                   "id": 1460088,
                   "name": "brand",
@@ -257,7 +259,11 @@ exports.train_luis_for_entities = (req, res, next) => {
 
               request(post_options)
                 .then(function (resp) {
-                  console.log('POST FOR TRAIN APPLICATION VERSION');
+                  console.log('POST - LUIS Trained successfully for new changes');
+                  res.status(200).json({
+                    success: true,
+                    message: "LUIS Trained successfully for new changes"
+                  });
                 })
                 .catch(function (err) {
                   // Deal with the error

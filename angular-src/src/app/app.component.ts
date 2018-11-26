@@ -20,8 +20,10 @@ export class AppComponent {
   }
 
   trainLUIS() {
+    this.noteApiService.showLoader = true;
     this.noteApiService.trainLUISForEntities().subscribe((data) => {
       if (data['success'] === true) {
+        this.noteApiService.showLoader = false;
         this.customToastService.toastMessage('success', 'LUIS Feeback', data['message']);
       }
     });
