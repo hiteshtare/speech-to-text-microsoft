@@ -181,10 +181,16 @@ exports.train_luis_for_entities = (req, res, next) => {
       }
     }, {
       "entities.products.$": 1
+    }, {
+      lean: true
     })
-    .then(notes => {
+    .then((notes) => {
+      console.log('PRODUCTS LIST');
+      var arr_notes = notes; // Array of Notes
       ///////////////////////////TRAINING LUIS///////////////////////////
-      const options = {
+
+      /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
+      const get_options = {
         method: 'GET',
         uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists/1460088',
         headers: {
@@ -197,19 +203,76 @@ exports.train_luis_for_entities = (req, res, next) => {
         // JSON stringifies the body automatically
       };
 
-      var brand_PhraseList;
-      request(options)
-        .then(function (response) {
-          brand_PhraseList = response["phrases"];
+      request(get_options)
+        .then(function (resp) {
+          console.log('GET FOR PHRASE LIST FEATURE ARRAY');
+          let json_resp = JSON.parse(resp);
+          let brand_PhraseList = json_resp["phrases"];
+
+          arr_notes.forEach((note) => {
+            let arr_products = notes["entities"]["products"];
+
+            arr_products.forEach((product) => {
+              brand_PhraseList += ',' + product["after"];
+            });
+          });
+
+          /**********************PUT FOR PHRASE LIST FEATURE ARRAY**********************/
+          const put_options = {
+            method: 'PUT',
+            uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists/1460088',
+            headers: {
+              'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
+            },
+            body: {
+              "id": 1460088,
+              "name": "brand",
+              "phrases": brand_PhraseList,
+              "isExchangeable": true,
+              "isActive": true
+            },
+            json: true
+          };
+
+          request(put_options)
+            .then(function (resp) {
+              console.log('PUT FOR PHRASE LIST FEATURE ARRAY');
+
+              /**********************POST FOR TRAIN APPLICATION VERSION**********************/
+              const post_options = {
+                method: 'POST',
+                uri: 'https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/train',
+                headers: {
+                  'Ocp-Apim-Subscription-Key': '10ddb0b870ea4e7fb06245e99559c248'
+                },
+                body: {
+                  "id": 1460088,
+                  "name": "brand",
+                  "phrases": brand_PhraseList,
+                  "isExchangeable": true,
+                  "isActive": true
+                },
+                json: true
+              };
+
+              request(post_options)
+                .then(function (resp) {
+                  console.log('POST FOR TRAIN APPLICATION VERSION');
+                })
+                .catch(function (err) {
+                  // Deal with the error
+                });
+              /**********************POST FOR TRAIN APPLICATION VERSION**********************/
+            })
+            .catch(function (err) {
+              // Deal with the error
+            });
+          /**********************PUT FOR PHRASE LIST FEATURE ARRAY**********************/
         })
         .catch(function (err) {
           // Deal with the error
         });
-
-      brand_PhraseList;
-
-
-
+      /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
 
       ///////////////////////////TRAINING LUIS///////////////////////////
 
