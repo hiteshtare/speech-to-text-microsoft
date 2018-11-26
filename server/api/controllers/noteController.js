@@ -205,7 +205,7 @@ exports.train_luis_for_entities = (req, res, next) => {
         });
         return;
       }
-      console.log('MONGO - Product List fetched for Training');
+      console.log(`MONGO - ${arr_notes.length} Product List fetched for Training`);
       /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
       const get_options = {
         method: 'GET',
@@ -272,30 +272,36 @@ exports.train_luis_for_entities = (req, res, next) => {
 
                   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
                   console.log('MONGO - Updating status of Product List Trained');
-                  arr_products.forEach((product, index) => {
-                    if (index == 0) {
-                      console.log(`Updating arr_products`);
-                    }
 
-                    const id = product["_id"];
-                    const updateOps = {
-                      "entities.products.$.status": "completed luis training"
-                    };
+                  arr_notes.forEach((note) => {
+                    arr_products = note["entities"]["products"];
 
-                    Note.updateOne({
-                        "entities.products._id": id
-                      }, {
-                        $set: updateOps
-                      })
-                      .then(note => {
-                        console.log(`Mongo - Updated product : ${id} successfully`);
-                      })
-                      .catch(err => {
-                        res.status(500).json({
-                          success: false,
-                          message: err
+                    arr_products.forEach((product, index) => {
+                      if (index == 0) {
+                        console.log(`Updating arr_products`);
+                      }
+
+                      const id = product["_id"];
+                      const updateOps = {
+                        "entities.products.$.status": "completed luis training"
+                      };
+
+                      Note.updateOne({
+                          "entities.products._id": id
+                        }, {
+                          $set: updateOps
+                        })
+                        .then(note => {
+                          console.log(`Mongo - Updated product : ${id} successfully`);
+                        })
+                        .catch(err => {
+                          res.status(500).json({
+                            success: false,
+                            message: err
+                          });
                         });
-                      });
+                    });
+
                   });
                   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
 
