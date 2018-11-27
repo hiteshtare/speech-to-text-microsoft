@@ -13,12 +13,9 @@ export class NoteApiService {
   showLoader = false;
 
   // For Developement
-  public notesApiUrl = 'http://localhost:5000';
-  // For Developement
-
+  public notesApiUrl = '';
   // For Production
   // private notesApiUrl = '';
-  // For Production
 
   constructor(private http: HttpClient) {
   }

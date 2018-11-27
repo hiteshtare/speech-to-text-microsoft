@@ -7,3 +7,5 @@ distrib/*
 /**/speech.key
 /samples/**/package-lock.json
 .idea/
+
+server/public/*
