@@ -628,5 +628,5 @@ function clearResult() {
 
 // To navigate user to Moderator view 
 function navigateToModeraterView() {
-    window.location.href = 'http://localhost:4200/'
+    window.location.href = '/#/list';
 }

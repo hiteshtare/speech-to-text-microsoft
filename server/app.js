@@ -3,10 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const path = require('path');
 
+//Initialize express app
 const app = express();
 
+//Custom Config
 var config = require('./config')
+
+//Custom Modules
 const noteRoute = require('./api/routes/noteRoute');
 const trainingRoute = require('./api/routes/trainingRoute');
 
@@ -27,6 +32,12 @@ app.use(bodyParser.urlencoded({ // Body Parser
 }));
 app.use(bodyParser.json());
 
+//Host static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+//For client route redirect to HTML Client
+app.use("/client", express.static(__dirname + "/client"));
+
 //Cross Origin Resource Scripting
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -45,8 +56,9 @@ app.use("/notes", noteRoute);
 // Routes which should handle requests
 app.use("/training", trainingRoute);
 
-app.get('*', (req, res) => {
-  res.send('Hello');
+//For any other route redirect to Angular-Src Dist
+app.get('*', function (req, res) {
+  res.send(path.join(__dirname), 'public/index.html');
 });
 
 app.use((req, res, next) => {

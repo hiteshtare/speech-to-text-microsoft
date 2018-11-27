@@ -17,7 +17,7 @@ export class AppComponent {
   }
 
   navigateToAssitantView() {
-    window.location.href = 'http://127.0.0.1:6060/';
+    window.location.href = `${environment.apiUrl}/client`;
   }
 
   trainLUIS() {
