@@ -15,18 +15,4 @@ export class AppComponent {
   constructor(private noteApiService: NoteApiService, private customToastService: CustomToastService) {
     this.noteApiService.notesApiUrl = environment.apiUrl;
   }
-
-  navigateToAssitantView() {
-    window.location.href = `${environment.apiUrl}/client`;
-  }
-
-  trainLUIS() {
-    this.noteApiService.showLoader = true;
-    this.noteApiService.trainLUISForEntities().subscribe((data) => {
-      if (data['success'] === true) {
-        this.noteApiService.showLoader = false;
-        this.customToastService.toastMessage('success', 'LUIS Feeback', data['message']);
-      }
-    });
-  }
 }

@@ -2,6 +2,7 @@ import { Note } from './../../shared/models/note.model';
 import { NoteApiService } from './../../shared/services/note-api.service';
 import { Component, OnInit } from '@angular/core';
 import { CustomToastService } from 'src/app/shared/services/custom-toast.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-list-note',
@@ -56,6 +57,21 @@ export class ListNoteComponent implements OnInit {
       if (data['success'] === true) {
         this.display = false;
         this.customToastService.toastMessage('success', 'Note Update', data['message']);
+        this.loadNotes();
+      }
+    });
+  }
+
+  navigateToAssitantView() {
+    window.location.href = `${environment.apiUrl}/client`;
+  }
+
+  trainLUIS() {
+    this.noteApiService.showLoader = true;
+    this.noteApiService.trainLUISForEntities().subscribe((data) => {
+      if (data['success'] === true) {
+        this.noteApiService.showLoader = false;
+        this.customToastService.toastMessage('success', 'LUIS Feeback', data['message']);
         this.loadNotes();
       }
     });

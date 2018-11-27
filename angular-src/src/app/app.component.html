@@ -5,10 +5,5 @@
     <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
   </div>
 </ng-container>
-<div class="content-section introduction">
-  <div><span class="feature-title">Moderator Screen</span></div><button pButton type="button" label="Navigate to Assistant Screen"
-    class="ui-button-warning" (click)="navigateToAssitantView()"></button><button pButton type="button" label="Train LUIS"
-    class="ui-button-success" (click)="trainLUIS()" [disabled]="noteApiService.showLoader"></button>
-</div>
 <router-outlet></router-outlet>
 <p-toast></p-toast>
