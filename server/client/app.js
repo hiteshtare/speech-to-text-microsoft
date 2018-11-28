@@ -5,7 +5,8 @@ var recognizer;
 var previousSubscriptionKey;
 
 var key_value = '25061b8c43ac4cb5a13512edf7cfdac3';
-var languageOptions_value = 'en-US';
+var languageOptions_value = 'en-US'; // For English Speech Recognition
+//var languageOptions_value = 'es-ES'; // For Spanish Speech Recognition
 var formatOptions_value = 'Simple';
 var recognitionMode_value = 'Conversation';
 var inputSource_value = 'Mic';
@@ -203,9 +204,21 @@ function OnComplete() {
 function extractInLUIS(phrase) {
     console.log(`phrase`);
     console.log(phrase);
+
+    //Luis Configurtion
+    var luis_config = {
+        appId: '00f2c5cb-7861-4b1e-9378-3b53859f4a1e', // call_notes_poc_v1
+        //appId: '723bdb51-386b-4eed-91e6-36d25739b1ac', // ES_call_notes_poc_v1
+        versionId: '0.1',
+        subscriptionKey: '10ddb0b870ea4e7fb06245e99559c248'
+    }
+
+    const luis_wepApiUri = `https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/${luis_config.appId}?subscription-key=${luis_config.subscriptionKey}`;
+
     var url =
-        "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/7317a1ca-fccc-4216-992d-a73f79dfafc5?subscription-key=10ddb0b870ea4e7fb06245e99559c248&timezoneOffset=-360&q=" +
+        `${luis_wepApiUri}&timezoneOffset=-360&q=` +
         phrase;
+
     console.log(url);
     document.getElementById("loading").innerHTML =
         '<img src="http://preloaders.net/preloaders/287/Filling%20broken%20ring.gif">loading...';
