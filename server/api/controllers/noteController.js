@@ -10,171 +10,149 @@ const luis_wepApiHeaders = {
   'Ocp-Apim-Subscription-Key': luis_config.subscriptionKey
 };
 
-exports.notes_get_all = (req, res, next) => {
-  Note
-    .find()
-    .sort({ //sorting the fields
-      updated_at: -1,
-      created_at: -1
-    })
-    .then(notes => {
+exports.notes_get_all = async (req, res, next) => {
+  try {
+    let notes = await Note.find()
+      .sort({ //sorting the fields
+        updated_at: -1,
+        created_at: -1
+      });
+
+    res.status(200).json({
+      success: true,
+      message: 'List of Notes fetched successfully',
+      payload: notes
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
+    });
+  }
+};
+
+exports.notes_create_note = async (req, res, next) => {
+  try {
+    const note = new Note({
+      _id: new mongoose.Types.ObjectId(),
+      machine_transcript: req.body.machine_transcript,
+      transcripts: req.body.transcripts,
+      is_transcript_approve: req.body.is_transcript_approve,
+      entities: req.body.entities
+    });
+
+    let result = await note.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Note created successfully',
+      payload: result
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
+    });
+  }
+};
+
+exports.notes_get_note = async (req, res, next) => {
+  try {
+    const id = req.params.noteId;
+
+    let note = await Note.findById(id);
+
+    if (note) {
       res.status(200).json({
         success: true,
-        message: 'List of Notes fetched successfully',
-        payload: notes
+        message: 'A Note fetched successfully',
+        payload: note
       });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
-      });
-    });
-};
-
-exports.notes_create_note = (req, res, next) => {
-  const note = new Note({
-    _id: new mongoose.Types.ObjectId(),
-    machine_transcript: req.body.machine_transcript,
-    transcripts: req.body.transcripts,
-    is_transcript_approve: req.body.is_transcript_approve,
-    entities: req.body.entities
-  });
-
-  note
-    .save()
-    .then(result => {
-      console.log(result);
-      res.status(201).json({
+    } else {
+      res.status(404).json({
         success: true,
-        message: 'Note created successfully',
-        payload: result
+        message: "No valid entry found for provided noteId"
       });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
-      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
     });
+  }
 };
 
-exports.notes_get_note = (req, res, next) => {
-  const id = req.params.noteId;
-  Note.findById(id)
-    .then(note => {
-      if (note) {
-        res.status(200).json({
-          success: true,
-          message: 'A Note fetched successfully',
-          payload: note
+exports.notes_updates_note = async (req, res, next) => {
+  try {
+    const id = req.params.noteId;
+    const updateOps = {
+      transcripts: req.body.transcripts,
+      is_transcript_approve: req.body.is_transcript_approve,
+      entities: req.body.entities
+    };
 
-        });
-      } else {
-        res.status(404).json({
-          success: true,
-          message: "No valid entry found for provided noteId"
+    let note = await Note.findById(id);
 
-        });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
+    if (note) {
+      let updated_note = await Note.update({
+        _id: id
+      }, {
+        $set: updateOps
       });
+
+      res.status(200).json({
+        success: true,
+        message: "Note updated successfully",
+        payload: note
+      });
+    } else {
+      res.status(404).json({
+        success: true,
+        message: "No valid entry found for provided noteId"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
     });
+  }
 };
 
-exports.notes_updates_note = (req, res, next) => {
-  const id = req.params.noteId;
-  const updateOps = {
-    transcripts: req.body.transcripts,
-    is_transcript_approve: req.body.is_transcript_approve,
-    entities: req.body.entities
-  };
+exports.notes_deletes_note = async (req, res, next) => {
+  try {
+    const id = req.params.noteId;
 
-  Note.findById(id)
-    .then(note => {
-      if (note) {
-        Note.update({
-            _id: id
-          }, {
-            $set: updateOps
-          })
-          .then(note => {
-            res.status(200).json({
-              success: true,
-              message: "Note updated successfully",
-              payload: note
+    let note = await Note.findById(id);
 
-            });
-          })
-          .catch(err => {
-            res.status(500).json({
-              success: false,
-              message: err
-
-            });
-          });
-      } else {
-        res.status(404).json({
-          success: true,
-          message: "No valid entry found for provided noteId"
-
-        });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
+    if (note) {
+      let result = await Note.deleteOne({
+        _id: id
       });
-    });
-};
 
-exports.notes_deletes_note = (req, res, next) => {
-  const id = req.params.noteId;
-
-  Note.findById(id)
-    .then(note => {
-      if (note) {
-        Note.remove({
-            _id: id
-          })
-          .then(result => {
-            res.status(200).json({
-              success: true,
-              message: "Note deleted successfully",
-              payload: id
-            });
-          })
-          .catch(err => {
-            res.status(500).json({
-              success: false,
-              message: err
-
-            });
-          });
-      } else {
-        res.status(404).json({
-          success: true,
-          message: "No valid entry found for provided noteId"
-
-        });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: err
+      res.status(200).json({
+        success: true,
+        message: "Note deleted successfully",
+        payload: id
       });
+    } else {
+      res.status(404).json({
+        success: true,
+        message: "No valid entry found for provided noteId"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
     });
+  }
 };
 
 exports.train_luis_for_entities = (req, res, next) => {
