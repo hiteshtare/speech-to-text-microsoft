@@ -1,7 +1,10 @@
 <div class="content-section introduction">
-  <div><span class="feature-title">Moderator Screen</span></div><button pButton type="button" label="Navigate to Assistant Screen"
-    class="ui-button-warning" (click)="navigateToAssitantView()"></button><button pButton type="button" label="Train LUIS"
-    class="ui-button-success" (click)="trainLUIS()" [disabled]="noteApiService.showLoader"></button>
+  <div>
+    <span class="feature-title">Moderator Screen</span>
+  </div>
+  <button pButton type="button" label="Navigate to Assistant Screen" class="ui-button-warning" (click)="navigateToAssitantView()"></button>
+  <button pButton type="button" label="Train LUIS" class="ui-button-success" (click)="trainLUIS()" [disabled]="noteApiService.showLoader"></button>
+  <button pButton type="button" label="Publish LUIS" class="ui-button-danger" (click)="publishLUIS()" [disabled]="noteApiService.showLoader"></button>
 </div>
 <p-table [value]="notes">
   <ng-template pTemplate="caption">

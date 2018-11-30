@@ -76,4 +76,15 @@ export class ListNoteComponent implements OnInit {
       }
     });
   }
+
+  publishLUIS() {
+    this.noteApiService.showLoader = true;
+    this.noteApiService.publishChangesOnLUIS().subscribe((data) => {
+      if (data['success'] === true) {
+        this.noteApiService.showLoader = false;
+        this.customToastService.toastMessage('success', 'Published Changes', data['message']);
+        this.loadNotes();
+      }
+    });
+  }
 }

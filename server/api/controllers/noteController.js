@@ -6,6 +6,7 @@ var config = require('../../config');
 
 const luis_config = config.luis_config;
 const luis_wepApiUri = `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${luis_config.appId}/versions/${luis_config.versionId}`;
+const publish_wepApiUri = `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${luis_config.appId}`;
 const luis_wepApiHeaders = {
   'Ocp-Apim-Subscription-Key': luis_config.subscriptionKey
 };
@@ -383,4 +384,38 @@ exports.train_luis_for_entities = (req, res, next) => {
   //       message: err
   //     });
   //   });
+};
+
+exports.publish_changes_for_luis = async (req, res, next) => {
+  try {
+    /**********************POST FOR TRAIN APPLICATION VERSION**********************/
+    const post_options = {
+      method: 'POST',
+      uri: `${publish_wepApiUri}/publish`,
+      headers: luis_wepApiHeaders,
+      body: {
+        "versionId": "0.1",
+        "isStaging": false,
+        "region": "westus"
+      },
+      json: true
+    };
+
+    request(post_options)
+      .then(function (resp) {
+        console.log('POST - Published Changes successfully on LUIS');
+      });
+
+    res.status(201).json({
+      success: true,
+      message: "Published Changes successfully on LUIS"
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err
+    });
+  }
 };

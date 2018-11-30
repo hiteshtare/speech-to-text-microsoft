@@ -37,4 +37,10 @@ export class NoteApiService {
       return data;
     }));
   }
+
+  publishChangesOnLUIS(): Observable<Response> {
+    return this.http.get(`${this.notesApiUrl}/publish`).pipe(map((data: Response) => {
+      return data;
+    }));
+  }
 }

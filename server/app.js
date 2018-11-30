@@ -14,6 +14,7 @@ var config = require('./config')
 //Custom Modules
 const noteRoute = require('./api/routes/noteRoute');
 const trainingRoute = require('./api/routes/trainingRoute');
+const publishRoute = require('./api/routes/publishRoute');
 
 //Connect to Database
 mongoose.connect(config.mongoURI_config, {
@@ -53,8 +54,8 @@ app.use((req, res, next) => {
 });
 // Routes which should handle requests
 app.use("/notes", noteRoute);
-// Routes which should handle requests
 app.use("/training", trainingRoute);
+app.use("/publish", publishRoute);
 
 //For any other route redirect to Angular-Src Dist
 app.get('*', function (req, res) {
