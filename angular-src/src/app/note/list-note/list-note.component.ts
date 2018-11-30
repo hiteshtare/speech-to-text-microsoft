@@ -68,6 +68,7 @@ export class ListNoteComponent implements OnInit {
 
   trainLUIS() {
     this.noteApiService.showLoader = true;
+    this.noteApiService.loadingMessage = 'LUIS Training';
     this.noteApiService.trainLUISForEntities().subscribe((data) => {
       if (data['success'] === true) {
         this.noteApiService.showLoader = false;
@@ -79,6 +80,7 @@ export class ListNoteComponent implements OnInit {
 
   publishLUIS() {
     this.noteApiService.showLoader = true;
+    this.noteApiService.loadingMessage = 'Publising Changes';
     this.noteApiService.publishChangesOnLUIS().subscribe((data) => {
       if (data['success'] === true) {
         this.noteApiService.showLoader = false;

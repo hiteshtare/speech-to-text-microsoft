@@ -1,7 +1,7 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <ng-container *ngIf="noteApiService.showLoader">
   <div class="content-section loader">
-    <h3>Luis Training in Progress</h3>
+    <h3>{{noteApiService.loadingMessage}} in Progress</h3>
     <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
   </div>
 </ng-container>

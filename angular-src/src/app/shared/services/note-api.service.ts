@@ -11,6 +11,7 @@ export class NoteApiService {
 
   headers: HttpHeaders;
   showLoader = false;
+  loadingMessage = '';
 
   // For Developement
   public notesApiUrl = '';
