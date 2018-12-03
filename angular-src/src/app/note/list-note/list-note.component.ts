@@ -3,6 +3,7 @@ import { NoteApiService } from './../../shared/services/note-api.service';
 import { Component, OnInit } from '@angular/core';
 import { CustomToastService } from 'src/app/shared/services/custom-toast.service';
 import { environment } from 'src/environments/environment';
+import { MenuItem } from 'primeng/components/common/menuitem';
 
 @Component({
   selector: 'app-list-note',
@@ -18,6 +19,7 @@ export class ListNoteComponent implements OnInit {
 
   constructor(private noteApiService: NoteApiService, private customToastService: CustomToastService) {
   }
+
 
   ngOnInit() {
     this.loadNotes();

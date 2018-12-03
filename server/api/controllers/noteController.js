@@ -266,10 +266,19 @@ exports.train_luis_for_entities = async (req, res, next) => {
           console.log(`brand_PhraseList`);
         }
         //Replace 'before' sub-string inside string with empty
-        brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
         //Concatinate the string with 'after' sub-string
-        brand_PhraseList += ',' + product["after"];
-        console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
+        if (product["before"] != null && product["after"] != null) {
+          brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
+          brand_PhraseList += ',' + product["after"];
+          console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
+        } else if (product["before"] != null && product["after"] == null) {
+          brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
+          brand_PhraseList += ',' + product["after"];
+          console.log(`Removed : ${product["before"]}`);
+        } else if (product["before"] == null && product["after"] != null) {
+          brand_PhraseList += ',' + product["after"];
+          console.log(`Added : ${product["after"]}`);
+        }
       }); //End of arr_products.forEach
     }); //End of arr_notes.forEach
 

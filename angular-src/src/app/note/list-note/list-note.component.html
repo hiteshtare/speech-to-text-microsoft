@@ -12,7 +12,7 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th style="width:16em">Id</th>
+      <th style="width:14em">Id</th>
       <th>Machine Transcript</th>
       <!-- <th>Transcript - Rep Edits</th> -->
       <!-- <th>Approval - Transcript </th> -->
@@ -30,7 +30,7 @@
         <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: 10px 0px">
           <ng-container *ngIf="note['entities']['products']">
             <ng-container *ngFor="let product of note['entities']['products']; let i = index">
-              <ng-container *ngIf="product.after">
+              <ng-container *ngIf="product">
                 <div class="ui-grid-row">
                   <div class="ui-grid-col-3">
                     <h4>Product</h4>
@@ -40,6 +40,17 @@
                   </div>
                   <div class="ui-grid-col-3">
                     {{product.after}}
+                  </div>
+                  <div class="ui-grid-col-3">
+                    <ng-container *ngIf="product.before && product.after">
+                      <span style="background-color: #00ffff42;">Updated</span>
+                    </ng-container>
+                    <ng-container *ngIf="product.before && product.after == null">
+                      <span style="background-color: #ff64647a;">Removed</span>
+                    </ng-container>
+                    <ng-container *ngIf="product.before == null && product.after">
+                      <span style="background-color: springgreen;">Added</span>
+                    </ng-container>
                   </div>
                   <div class="ui-grid-col-3">
                     <i>{{product.status}}</i>
@@ -113,11 +124,14 @@
               <h3>After</h3>
             </div>
             <div class="ui-grid-col-4">
+              <h3>Status</h3>
+            </div>
+            <div class="ui-grid-col-4">
               <h3>Approve</h3>
             </div>
           </div>
           <ng-container *ngFor="let product of tempnote['entities']['products']; let i = index">
-            <ng-container *ngIf="product.after">
+            <ng-container *ngIf="product">
               <div class="ui-grid-row">
                 <div class="ui-grid-col-4">
                   {{product.before}}
@@ -125,12 +139,28 @@
                 <div class="ui-grid-col-4">
                   {{product.after}}
                 </div>
+                <div class="ui-grid-col-3">
+                  <ng-container *ngIf="product.before && product.after">
+                    <span style="background-color: #00ffff42;">Updated</span>
+                  </ng-container>
+                  <ng-container *ngIf="product.before && product.after == null">
+                    <span style="background-color: #ff64647a;">Removed</span>
+                  </ng-container>
+                  <ng-container *ngIf="product.before == null && product.after">
+                    <span style="background-color: springgreen;">Added</span>
+                  </ng-container>
+                </div>
+                <ng-container *ngIf="product.status == 'pending for moderator approval'">
+                  <div class="ui-grid-col-4">
+                    <p-inputSwitch [(ngModel)]="tempnote['entities']['products'][i].is_approve"></p-inputSwitch>
+                  </div>
+                </ng-container>
                 <div class="ui-grid-col-4">
-                  <p-inputSwitch [(ngModel)]="tempnote['entities']['products'][i].is_approve"></p-inputSwitch>
+                  &nbsp;
                 </div>
               </div>
             </ng-container>
-            <ng-container *ngIf="!product.after">
+            <!-- <ng-container *ngIf="!product.after">
               <div class="ui-grid-row">
                 <div class="ui-grid-col-4">
                   {{product.before}}
@@ -142,7 +172,7 @@
                   &nbsp;
                 </div>
               </div>
-            </ng-container>
+            </ng-container> -->
           </ng-container>
         </div>
       </p-panel>
