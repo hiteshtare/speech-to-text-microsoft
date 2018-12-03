@@ -19,7 +19,7 @@
         }
 
         .highlight {
-            background-color: aqua;
+            background-color: yellow;
         }
 
         .highlight-pre {
@@ -27,7 +27,7 @@
         }
 
 /********************************** OVERLAY *********************************/
-#overlay {
+.overlay {
      visibility: hidden;
      position: absolute;
      left: 0px;
@@ -38,16 +38,38 @@
      z-index: 1000;
 }
 
-#overlay div {
-     width:300px;
-     margin: 100px auto;
-     background-color: #fff;
-     border:1px solid #000;
-     padding:15px;
-     text-align:center;
-     background-color: #fbcf80;
-     left: 40%;
-     position: fixed;
+#edit-overlay div {
+width:300px;
+margin: 100px auto;
+background-color: #fff;
+border:1px solid #000;
+padding:15px;
+text-align:center;
+background-color: #00ffff42;
+left: 40%;
+position: fixed;
+}
+#add-overlay div {
+width:300px;
+margin: 100px auto;
+background-color: #fff;
+border:1px solid #000;
+padding:15px;
+text-align:center;
+background-color:#00ff7f69;
+left: 40%;
+position: fixed;
+}
+#remove-overlay div {
+width:300px;
+margin: 100px auto;
+background-color: #fff;
+border:1px solid #000;
+padding:15px;
+text-align:center;
+background-color: #ff64647a;
+left: 40%;
+position: fixed;
 }
 /********************************** OVERLAY *********************************/
 
@@ -188,6 +210,9 @@ width: 180px;
                                                 <!-- <img src="right.png" style=" height: 102vh; width: 100vh;"> -->
                                                 <div class="row" style="padding-top:5px;">
                                                     <div class="col-sm-12" id="product" style="display:none;"><b>Products</b>
+                                                        <button type="button" data-toggle="tooltip" title="Add new Product"
+                                                            style="background-color: springgreen;" class="btn btn-default btn-sm"
+                                                            onclick="addEntitesPopup('products')"><span class="glyphicon glyphicon-plus"></span></button>
                                                         <pre id="productName"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -274,7 +299,7 @@ width: 180px;
     </div>
 
 
-    <div id="overlay">
+    <div id="edit-overlay" class="overlay">
         <div>
             <h4>Edit Popup</h4>
             Current Value :
@@ -282,7 +307,23 @@ width: 180px;
             <br>
             <p><input type="text" id="result" name="result" value=""></p>
             <br>
-            <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup()">Cancel</button>
+            <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup('edit-overlay')">Cancel</button>
+        </div>
+    </div>
+    <div id="add-overlay" class="overlay">
+        <div>
+            <h4>Add Popup</h4>
+            <p><input type="text" id="add-result" name="add-result" value=""></p>
+            <br>
+            <button type="button" onclick="addChanges()">Add</button> | <button type="button" onclick="closePopup('add-overlay')">Cancel</button>
+        </div>
+    </div>
+    <div id="remove-overlay" class="overlay">
+        <div>
+            <h4>Remove Popup</h4>
+            Value :
+            <pre id="remove-change"></pre>
+            <button type="button" onclick="removeChanges()">Remove</button> | <button type="button" onclick="closePopup('remove-overlay')">Cancel</button>
         </div>
     </div>
 

@@ -187,8 +187,9 @@ function OnComplete() {
     stopBtn.disabled = true;
     editBtn.disabled = false;
 
-    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+    //Testing
+    phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
     if (phraseDiv.innerHTML) {
 
@@ -197,6 +198,9 @@ function OnComplete() {
         document.getElementById("dvSubmit").style.display = "block";
         document.getElementById('dvEdit').style.display = "block";
         phraseTextArea.value = phraseDiv.innerHTML;
+
+        //Testing
+        submitToLUIS();
     }
 }
 
@@ -270,14 +274,19 @@ function extractInLUIS(phrase) {
 
                 if (index === 0) {
                     document.getElementById("productName").innerHTML += "<i>score : " + score + "</i>" + "\n";
+                    document.getElementById("productName").innerHTML += "<u>name</u>" + "\t" + "<u>status</u>" + "\t" + "<u>action</u>" + "\t" + "\n";
                 }
                 highlightTextInsideDiv(productName);
 
                 var productId = objJSON['products'].length - 1;
-                var buttonEDIT_PRODUCT = `<button type="button" onclick="openPopup('products',${productId})">Edit</button>`;
-                var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('products',${productId})">Show</button>`;
+                var buttonEDIT_PRODUCT = `<button type="button" data-toggle="tooltip" title="Edit Product" style="background-color: aqua;" class = "btn btn-default btn-sm"
+                onclick = "openPopup('products',${productId})" ><span class="glyphicon glyphicon-pencil"></span></button>`;
+                var buttonREMOVE_PRODUCT = `| <button type="button" data-toggle="tooltip" title="Remove Product" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
+                onclick = "removeEntitesPopup('products',${productId})"> <span class="glyphicon glyphicon-trash"></span></button>`;
 
-                document.getElementById("productName").innerHTML += productName + "\t" + buttonOK + buttonEDIT_PRODUCT + "\n";
+                // var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('products',${productId})">Show</button>`;
+
+                document.getElementById("productName").innerHTML += productName + "\t" + "\t" + buttonOK + buttonEDIT_PRODUCT + buttonREMOVE_PRODUCT + "\n";
                 document.getElementById('product').style.display = 'block';
             });
             /*############################PRODUCT############################*/
@@ -409,12 +418,12 @@ function extractInLUIS(phrase) {
         } else {
             objJSON = {};
 
-            document.getElementById("product").style.display = "none";
+            document.getElementById("product").style.display = "block";
             document.getElementById('keywordsM').style.display = 'none';
             document.getElementById('followupM').style.display = 'none';
 
-            document.getElementById('dvSave').style.display = "none";
-            document.getElementById('dvCancel').style.display = "none";
+            document.getElementById('dvSave').style.display = "block";
+            document.getElementById('dvCancel').style.display = "block";
         }
     }
     // }
@@ -477,12 +486,12 @@ function highlightPredefinedTags(a_arrPredefinedTags) {
 }
 
 // To open Edit Popup  
-function openPopup(a_type, a_id) {
+function openPopup(a_type, a_id, ) {
 
     type = a_type;
     id = a_id;
 
-    el = document.getElementById("overlay");
+    el = document.getElementById("edit-overlay");
     el.style.visibility = "visible";
 
     var input = document.getElementById("result");
@@ -498,13 +507,41 @@ function openPopup(a_type, a_id) {
 
     document.getElementById("change").innerHTML = current_value;
 }
+// To open Add Popup  
+function addEntitesPopup(a_type) {
+
+    type = a_type;
+
+    el = document.getElementById("add-overlay");
+    el.style.visibility = "visible";
+
+    var input = document.getElementById("add-result");
+}
+// To open Remove Popup  
+function removeEntitesPopup(a_type, a_id) {
+
+    type = a_type;
+    id = a_id;
+
+    el = document.getElementById("remove-overlay");
+    el.style.visibility = "visible";
+
+    let current_value = '';
+    if (objNote['entities'][type][id]["after"]) {
+        current_value = objNote['entities'][type][id]["after"];
+    } else {
+        current_value = objNote['entities'][type][id]["before"];
+    }
+
+    document.getElementById("remove-change").innerHTML = current_value;
+}
 
 // To close Edit Popup  
-function closePopup() {
+function closePopup(p_overlay_name) {
     type = '';
     id = '';
 
-    el = document.getElementById("overlay");
+    el = document.getElementById(p_overlay_name);
     el.style.visibility = "hidden";
 }
 
@@ -518,7 +555,53 @@ function saveChanges() {
         objNote['entities'][type][id]["status"] = "pending for moderator approval";
 
         document.getElementById("change").innerHTML = objNote['entities'][type][id]["after"];
-        //closePopup();
+
+        document.getElementById("productName").innerHTML += objNote['entities'][type][id]["before"] + ' | ' + input.value + "\t" + '<span style="background-color: #00ffff42;">Updated</span>' + "\t";
+
+        closePopup('edit-overlay');
+    }
+}
+
+// To save changes in objJSON          
+function addChanges() {
+    if (type != '') {
+        var input = document.getElementById("add-result");
+
+        var newObj = {
+            'after': input.value,
+            'before': null,
+            'is_approve': false,
+            'status': "pending for moderator approval"
+        };
+
+        objNote['entities'][type].push(newObj);
+
+        var productId = objNote['entities'][type].length - 1;
+        // var buttonREMOVE_PRODUCT = `<button type="button" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
+        //         onclick = "removeEntitesPopup('products',${productId})"> <span class="glyphicon glyphicon-trash"></span></button>`;
+        var buttonREMOVE_PRODUCT = ``;
+
+
+        document.getElementById("productName").innerHTML += input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+
+        closePopup('add-overlay');
+
+        document.getElementById("add-result").value = '';
+    }
+}
+
+// To save changes in objJSON          
+function removeChanges() {
+    if (type != '' || id != '') {
+
+        var value = document.getElementById("remove-change").innerHTML;
+
+        objNote['entities'][type][id]["is_approve"] = false;
+        objNote['entities'][type][id]["status"] = "pending for moderator approval";
+
+        document.getElementById("productName").innerHTML += value + "\t" + '<span style="background-color: #ff64647a;">Removed</span>' + "\t";
+
+        closePopup('remove-overlay');
     }
 }
 
