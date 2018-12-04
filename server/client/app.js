@@ -242,6 +242,9 @@ function extractInLUIS(phrase) {
         console.log(`token.entities.length`);
         console.log(token.entities.length);
         if (token.entities.length > 0) {
+            document.getElementById("product").style.display = "block";
+            document.getElementById('keywordsM').style.display = "block";
+
             objJSON['products'] = [];
             objJSON['keymessages'] = [];
             objJSON['followups'] = [];
@@ -281,12 +284,12 @@ function extractInLUIS(phrase) {
                 var productId = objJSON['products'].length - 1;
                 var buttonEDIT_PRODUCT = `<button type="button" data-toggle="tooltip" title="Edit Product" style="background-color: aqua;" class = "btn btn-default btn-sm"
                 onclick = "openPopup('products',${productId})" ><span class="glyphicon glyphicon-pencil"></span></button>`;
-                var buttonREMOVE_PRODUCT = `| <button type="button" data-toggle="tooltip" title="Remove Product" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
+                var buttonREMOVE_PRODUCT = `<button type="button" data-toggle="tooltip" title="Remove Product" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
                 onclick = "removeEntitesPopup('products',${productId})"> <span class="glyphicon glyphicon-trash"></span></button>`;
 
                 // var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('products',${productId})">Show</button>`;
 
-                document.getElementById("productName").innerHTML += productName + "\t" + "\t" + buttonOK + buttonEDIT_PRODUCT + buttonREMOVE_PRODUCT + "\n";
+                document.getElementById("productName").innerHTML += productName + "\t" + "\t" + buttonREMOVE_PRODUCT + "\n";
                 document.getElementById('product').style.display = 'block';
             });
             /*############################PRODUCT############################*/
@@ -419,7 +422,7 @@ function extractInLUIS(phrase) {
             objJSON = {};
 
             document.getElementById("product").style.display = "block";
-            document.getElementById('keywordsM').style.display = 'none';
+            document.getElementById('keywordsM').style.display = "block";
             document.getElementById('followupM').style.display = 'none';
 
             document.getElementById('dvSave').style.display = "block";
