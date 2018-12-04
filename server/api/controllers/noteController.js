@@ -329,6 +329,64 @@ exports.train_luis_for_entities = async (req, res, next) => {
 
 exports.publish_changes_for_luis = async (req, res, next) => {
   try {
+    ///////////////////////////PRODUCTS///////////////////////////
+    let arr_notes = await Note.find({ // Array of Notes
+      'entities.products': {
+        $elemMatch: {
+          'is_approve': true,
+          'status': 'completed luis training'
+        }
+      }
+    }, {
+      "entities.products.$": 1
+    }, {
+      lean: true
+    });
+
+    var arr_products; // Array of Products
+    ///////////////////////////TRAINING LUIS///////////////////////////
+
+    //To check if Array of Notes is empty then return with 'No data found' message
+    if (arr_notes.length == 0) {
+      console.log('MONGO - No Product List Records');
+      res.status(200).json({
+        success: true,
+        message: "No data found for Publishing LUIS"
+      });
+      return;
+    }
+
+    //Else proceed further
+    console.log(`MONGO - ${arr_notes.length} Product List fetched for Publishing LUIS`);
+
+    /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
+    console.log('MONGO - Updating status of Product List - Published');
+
+    arr_notes.forEach(async (note) => {
+      arr_products = note["entities"]["products"];
+
+      arr_products.forEach(async (product, index) => {
+        if (index == 0) {
+          console.log(`Updating arr_products`);
+        }
+
+        const id = product["_id"];
+        const updateOps = {
+          "entities.products.$.status": "published"
+        };
+
+        //Update the note with 'published' status using ObjectId
+        await Note.updateOne({
+          "entities.products._id": id
+        }, {
+          $set: updateOps
+        });
+
+        console.log(`Mongo - Updated product : ${id} successfully`);
+      }); //End of arr_products.forEach
+    }); //End of arr_notes.forEach
+    /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
+
     /**********************POST FOR TRAIN APPLICATION VERSION**********************/
     const post_options = {
       method: 'POST',
@@ -351,7 +409,6 @@ exports.publish_changes_for_luis = async (req, res, next) => {
       success: true,
       message: "Published Changes successfully on LUIS"
     });
-
   } catch (err) {
     console.log(err);
     res.status(500).json({

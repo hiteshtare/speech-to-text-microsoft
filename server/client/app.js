@@ -699,6 +699,18 @@ function saveResult() {
     };
     var data = JSON.stringify(objNote);
     xhr.send(data);
+
+    //Reset objNote after note is saved
+    objNote = {
+        'machine_transcript': [],
+        'transcripts': [],
+        'is_transcript_approve': false,
+        'entities': {
+            'products': [],
+            'keymessages': [],
+            'followups': []
+        }
+    };
 }
 
 // To clear result
