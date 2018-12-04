@@ -49,7 +49,18 @@ background-color: #00ffff42;
 left: 40%;
 position: fixed;
 }
-#add-overlay div {
+#add-product-overlay div {
+width:300px;
+margin: 100px auto;
+background-color: #fff;
+border:1px solid #000;
+padding:15px;
+text-align:center;
+background-color:#00ff7f69;
+left: 40%;
+position: fixed;
+}
+#add-keymessage-overlay div {
 width:300px;
 margin: 100px auto;
 background-color: #fff;
@@ -212,7 +223,8 @@ width: 180px;
                                                     <div class="col-sm-12" id="product" style="display:none;"><b>Products</b>
                                                         <button type="button" data-toggle="tooltip" title="Add new Product"
                                                             style="background-color: springgreen;" class="btn btn-default btn-sm"
-                                                            onclick="addEntitesPopup('products')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                            onclick="addEntitesPopup('add-product-overlay')"><span
+                                                                class="glyphicon glyphicon-plus"></span></button>
                                                         <pre id="productName"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -221,6 +233,10 @@ width: 180px;
                                                 <div class="row" style="padding-top:5px;">
                                                     <div class="col-sm-12" id="keywordsM" style="display:none;"><b>Key
                                                             Messages</b>
+                                                        <button type="button" data-toggle="tooltip" title="Add new Key Message"
+                                                            style="background-color: springgreen;" class="btn btn-default btn-sm"
+                                                            onclick="addEntitesPopup('add-keymessage-overlay')"><span
+                                                                class="glyphicon glyphicon-plus"></span></button>
                                                         <pre id="keywords"></pre>
                                                     </div>
                                                     <!-- <div class="col-sm-6"></div> -->
@@ -310,12 +326,21 @@ width: 180px;
             <button type="button" onclick="saveChanges()">Save</button> | <button type="button" onclick="closePopup('edit-overlay')">Cancel</button>
         </div>
     </div>
-    <div id="add-overlay" class="overlay">
+    <div id="add-product-overlay" class="overlay">
         <div>
-            <h4>Add Popup</h4>
+            <h4>Add new Product</h4>
             <p><input type="text" id="add-result" name="add-result" value=""></p>
             <br>
-            <button type="button" onclick="addChanges()">Add</button> | <button type="button" onclick="closePopup('add-overlay')">Cancel</button>
+            <button type="button" onclick="addChanges('products')">Add</button> | <button type="button" onclick="closePopup('add-product-overlay')">Cancel</button>
+        </div>
+    </div>
+    <div id="add-keymessage-overlay" class="overlay">
+        <div>
+            <h4>Add new Key Message</h4>
+            <p>Select Type : <select id="select-keymessage-result"></select></p>
+            <p>Name : <input type="text" id="add-keymessage-result" name="add-result" value=""></p>
+            <br>
+            <button type="button" onclick="addChanges('keymessages')">Add</button> | <button type="button" onclick="closePopup('add-keymessage-overlay')">Cancel</button>
         </div>
     </div>
     <div id="remove-overlay" class="overlay">

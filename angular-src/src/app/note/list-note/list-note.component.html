@@ -45,7 +45,7 @@
                     <ng-container *ngIf="product.before && product.after">
                       <span style="background-color: #00ffff42;">Updated</span>
                     </ng-container>
-                    <ng-container *ngIf="product.before && product.after == null">
+                    <ng-container *ngIf="product.before && product.after == null  && product.is_approve != null">
                       <span style="background-color: #ff64647a;">Removed</span>
                     </ng-container>
                     <ng-container *ngIf="product.before == null && product.after">
@@ -61,7 +61,7 @@
           </ng-container>
           <ng-container *ngIf="note['entities']['keymessages']">
             <ng-container *ngFor="let keymessage of note['entities']['keymessages']">
-              <ng-container *ngIf="keymessage.after">
+              <ng-container *ngIf="keymessage">
                 <div class="ui-grid-row">
                   <div class="ui-grid-col-3">
                     <h4>Key Message</h4>
@@ -71,6 +71,17 @@
                   </div>
                   <div class="ui-grid-col-3">
                     {{keymessage.after}}
+                  </div>
+                  <div class="ui-grid-col-3">
+                    <ng-container *ngIf="keymessage.before && keymessage.after">
+                      <span style="background-color: #00ffff42;">Updated</span>
+                    </ng-container>
+                    <ng-container *ngIf="keymessage.before && keymessage.after == null && keymessage.is_approve != null">
+                      <span style="background-color: #ff64647a;">Removed</span>
+                    </ng-container>
+                    <ng-container *ngIf="keymessage.before == null && keymessage.after">
+                      <span style="background-color: springgreen;">Added</span>
+                    </ng-container>
                   </div>
                   <div class="ui-grid-col-3">
                     <i>{{keymessage.status}}</i>
@@ -143,7 +154,7 @@
                   <ng-container *ngIf="product.before && product.after">
                     <span style="background-color: #00ffff42;">Updated</span>
                   </ng-container>
-                  <ng-container *ngIf="product.before && product.after == null">
+                  <ng-container *ngIf="product.before && product.after == null && product.is_approve != null">
                     <span style="background-color: #ff64647a;">Removed</span>
                   </ng-container>
                   <ng-container *ngIf="product.before == null && product.after">
@@ -188,12 +199,14 @@
               <h3>After</h3>
             </div>
             <div class="ui-grid-col-4">
+              <h3>Status</h3>
+            </div>
+            <div class="ui-grid-col-4">
               <h3>Approve</h3>
             </div>
           </div>
           <ng-container *ngFor="let keymessage of tempnote['entities']['keymessages']; let i = index">
-            <ng-container *ngIf="
-            keymessage.after">
+            <ng-container *ngIf="keymessage">
               <div class="ui-grid-row">
                 <div class="ui-grid-col-4">
                   {{keymessage.before}}
@@ -201,19 +214,22 @@
                 <div class="ui-grid-col-4">
                   {{keymessage.after}}
                 </div>
-                <div class="ui-grid-col-4">
-                  <p-inputSwitch [(ngModel)]="tempnote['entities']['keymessages'][i].is_approve"></p-inputSwitch>
+                <div class="ui-grid-col-3">
+                  <ng-container *ngIf="keymessage.before && keymessage.after">
+                    <span style="background-color: #00ffff42;">Updated</span>
+                  </ng-container>
+                  <ng-container *ngIf="keymessage.before && keymessage.after == null && keymessage.is_approve != null">
+                    <span style="background-color: #ff64647a;">Removed</span>
+                  </ng-container>
+                  <ng-container *ngIf="keymessage.before == null && keymessage.after">
+                    <span style="background-color: springgreen;">Added</span>
+                  </ng-container>
                 </div>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="!keymessage.after">
-              <div class="ui-grid-row">
-                <div class="ui-grid-col-4">
-                  {{keymessage.before}}
-                </div>
-                <div class="ui-grid-col-4">
-                  {{keymessage.after}}
-                </div>
+                <ng-container *ngIf="keymessage.status == 'pending for moderator approval'">
+                  <div class="ui-grid-col-4">
+                    <p-inputSwitch [(ngModel)]="tempnote['entities']['keymessages'][i].is_approve"></p-inputSwitch>
+                  </div>
+                </ng-container>
                 <div class="ui-grid-col-4">
                   &nbsp;
                 </div>

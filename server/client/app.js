@@ -131,6 +131,8 @@ document.addEventListener("DOMContentLoaded", function () {
         SDK = speechSdk;
         startBtn.disabled = false;
     });
+
+    bindKeyMessageSelect();
 });
 
 function Setup() {
@@ -512,13 +514,13 @@ function openPopup(a_type, a_id, ) {
 }
 // To open Add Popup  
 function addEntitesPopup(a_type) {
+    closePopup('add-product-overlay');
+    closePopup('add-keymessage-overlay');
 
     type = a_type;
 
-    el = document.getElementById("add-overlay");
+    el = document.getElementById(a_type);
     el.style.visibility = "visible";
-
-    var input = document.getElementById("add-result");
 }
 // To open Remove Popup  
 function removeEntitesPopup(a_type, a_id) {
@@ -566,30 +568,47 @@ function saveChanges() {
 }
 
 // To save changes in objJSON          
-function addChanges() {
-    if (type != '') {
-        var input = document.getElementById("add-result");
+function addChanges(p_type) {
+    if (p_type != '') {
 
         var newObj = {
-            'after': input.value,
             'before': null,
             'is_approve': false,
             'status': "pending for moderator approval"
         };
-
-        objNote['entities'][type].push(newObj);
-
-        var productId = objNote['entities'][type].length - 1;
-        // var buttonREMOVE_PRODUCT = `<button type="button" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
-        //         onclick = "removeEntitesPopup('products',${productId})"> <span class="glyphicon glyphicon-trash"></span></button>`;
         var buttonREMOVE_PRODUCT = ``;
 
+        if (p_type === 'products') {
+            var input = document.getElementById("add-result");
 
-        document.getElementById("productName").innerHTML += input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+            newObj['after'] = input.value;
 
-        closePopup('add-overlay');
+            document.getElementById("productName").innerHTML += input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+
+        } else {
+            var select = document.getElementById("select-keymessage-result");
+
+            var input = document.getElementById("add-keymessage-result");
+
+            newObj['phrase_id'] = select.value;
+            newObj['after'] = input.value;
+
+            document.getElementById("keywords").innerHTML += select.options[select.selectedIndex].text + ' >> ' + input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+        }
+
+        objNote['entities'][p_type].push(newObj);
+
+        var Id = objNote['entities'][p_type].length - 1;
+        // buttonREMOVE_PRODUCT = `<button type="button" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
+        //         onclick = "removeEntitesPopup('products',${Id})"> <span class="glyphicon glyphicon-trash"></span></button>`;
+
+
+
+        closePopup('add-product-overlay');
+        closePopup('add-keymessage-overlay');
 
         document.getElementById("add-result").value = '';
+        document.getElementById("add-keymessage-result").value = '';
     }
 }
 
@@ -740,4 +759,34 @@ function clearResult() {
 // To navigate user to Moderator view 
 function navigateToModeraterView() {
     window.location.href = '/#/list';
+}
+
+// To bind Key Message Dropdown
+function bindKeyMessageSelect() {
+    var xhr = new XMLHttpRequest();
+    var url = "https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/00f2c5cb-7861-4b1e-9378-3b53859f4a1e/versions/0.1/phraselists?skip=0&take=100";
+    xhr.open("GET", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Ocp-Apim-Subscription-Key", "10ddb0b870ea4e7fb06245e99559c248");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            console.log(`GET - bindKeyMessageSelect`);
+            var response = JSON.parse(xhr.response);
+            console.log(response);
+
+            var option = '';
+            var select = document.getElementById("select-keymessage-result");
+
+            response.forEach((phrase, index) => {
+                if (phrase['id'] != '1460088') {
+                    select.options[index - 1] = new Option(phrase['name'], phrase['id']);
+                }
+            });
+
+            // el = document.getElementById('add-keymessage-overlay');
+            // el.style.visibility = "visible";
+
+        }
+    };
+    xhr.send();
 }
