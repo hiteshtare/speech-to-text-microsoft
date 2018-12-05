@@ -99,7 +99,7 @@ exports.notes_updates_note = async (req, res, next) => {
     let note = await Note.findById(id);
 
     if (note) {
-      let updated_note = await Note.update({
+      let updated_note = await Note.updateOne({
         _id: id
       }, {
         $set: updateOps
@@ -250,7 +250,7 @@ async function productsTraining() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Product List Records');
+    console.log('MONGO - No Products for Training');
     // res.status(200).json({
     //   success: true,
     //   message: "No data found for LUIS trainig"
@@ -259,7 +259,7 @@ async function productsTraining() {
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Product List fetched for Training`);
+  console.log(`MONGO - ${arr_notes.length} Products fetched for Training`);
 
   /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
   let phrase = {
@@ -283,15 +283,14 @@ async function productsTraining() {
       }
       //Replace 'before' sub-string inside string with empty
       //Concatinate the string with 'after' sub-string
-      if (product["before"] != null && product["after"] != null) {
+      if (product["before"] != null && product["after"] != null) { //For Updation
         brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
         brand_PhraseList += ',' + product["after"];
         console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
-      } else if (product["before"] != null && product["after"] == null) {
+      } else if (product["before"] != null && product["after"] == null) { //For Removal
         brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
-        brand_PhraseList += ',' + product["after"];
         console.log(`Removed : ${product["before"]}`);
-      } else if (product["before"] == null && product["after"] != null) {
+      } else if (product["before"] == null && product["after"] != null) { //For Addition
         brand_PhraseList += ',' + product["after"];
         console.log(`Added : ${product["after"]}`);
       }
@@ -308,7 +307,7 @@ async function productsTraining() {
   /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
 
   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
-  console.log('MONGO - Updating status of Product List Trained');
+  console.log('MONGO - Updating status of Products Trained');
 
   arr_notes.forEach(async (note) => {
     arr_products = note["entities"]["products"];
@@ -355,7 +354,7 @@ async function keyMessagesTraining() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Key Messages List Records');
+    console.log('MONGO - No Key Messages for Training');
     // res.status(200).json({
     //   success: true,
     //   message: "No data found for LUIS trainig"
@@ -364,7 +363,7 @@ async function keyMessagesTraining() {
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Key Messages List fetched for Training`);
+  console.log(`MONGO - ${arr_notes.length} Key Messages fetched for Training`);
 
   /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
   var arr_allPhraseList = await getPhraseArrayFromPhraseList();
@@ -380,21 +379,20 @@ async function keyMessagesTraining() {
       arr_allPhraseList.forEach((phrase, p_index) => {
         phrase['has_change'] = false;
         if (phrase['id'] == keymessage['phrase_id']) {
-          console.log(`${phrase['name']} >> is going to be updated.`);
+          console.log(`PHRASE - ${phrase['name']} updated.`);
 
           current_PhraseList = phrase['phrases'];
 
           //Replace 'before' sub-string inside string with empty
           //Concatinate the string with 'after' sub-string
-          if (keymessage["before"] != null && keymessage["after"] != null) {
+          if (keymessage["before"] != null && keymessage["after"] != null) { //For Updation
             current_PhraseList = current_PhraseList.replace(`,${keymessage["before"]}`, '');
             current_PhraseList += ',' + keymessage["after"];
             console.log(`Updated : From ${keymessage["before"]} to ${keymessage["after"]}`);
-          } else if (keymessage["before"] != null && keymessage["after"] == null) {
+          } else if (keymessage["before"] != null && keymessage["after"] == null) { //For Removal
             current_PhraseList = current_PhraseList.replace(`,${keymessage["before"]}`, '');
-            current_PhraseList += ',' + keymessage["after"];
             console.log(`Removed : ${keymessage["before"]}`);
-          } else if (keymessage["before"] == null && keymessage["after"] != null) {
+          } else if (keymessage["before"] == null && keymessage["after"] != null) { //For Addition
             current_PhraseList += ',' + keymessage["after"];
             console.log(`Added : ${keymessage["after"]}`);
           }
@@ -416,7 +414,7 @@ async function keyMessagesTraining() {
   /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
 
   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
-  console.log('MONGO - Updating status of Product List Trained');
+  console.log('MONGO - Updating status of Key Messages Trained');
 
   arr_notes.forEach(async (note) => {
     arr_keymessages = note["entities"]["keymessages"];
@@ -452,7 +450,7 @@ exports.train_luis_for_entities = async (req, res, next) => {
 
     await keyMessagesTraining();
 
-    //await trainLuisApp();
+    await trainLuisApp();
 
     res.status(200).json({
       success: true,
@@ -487,15 +485,15 @@ async function productsPublishing() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Product List Records');
+    console.log('MONGO - No Product for Publishing');
     return;
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Product List fetched for Publishing LUIS`);
+  console.log(`MONGO - ${arr_notes.length} Products fetched for Publishing`);
 
   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
-  console.log('MONGO - Updating status of Product List - Published');
+  console.log('MONGO - Updating status of Products Published');
 
   arr_notes.forEach(async (note) => {
     arr_products = note["entities"]["products"];
@@ -544,15 +542,15 @@ async function keyMessagesPublishing() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Key Message List Records');
+    console.log('MONGO - No Key Message for Publishing');
     return;
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Key Message List fetched for Publishing LUIS`);
+  console.log(`MONGO - ${arr_notes.length} Key Messages fetched for Publishing LUIS`);
 
   /*#####################UPDATING STATUS OF Key Message LIST#####################*/
-  console.log('MONGO - Updating status of Key Message List - Published');
+  console.log('MONGO - Updating status of Key Messages Published');
 
   arr_notes.forEach(async (note) => {
     arr_keymessages = note["entities"]["keymessages"];
@@ -604,12 +602,12 @@ exports.publish_changes_for_luis = async (req, res, next) => {
 
     await request(post_options)
       .then(function (resp) {
-        console.log('POST - Published Changes successfully on LUIS');
+        console.log('POST - Changes successfully Published for LUIS');
       });
 
     res.status(201).json({
       success: true,
-      message: "Published Changes successfully on LUIS"
+      message: "Published Changes successfully Published for LUIS"
     });
   } catch (err) {
     console.log(err);

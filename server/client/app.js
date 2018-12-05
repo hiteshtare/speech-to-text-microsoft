@@ -287,7 +287,7 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_PRODUCT = `<button type="button" data-toggle="tooltip" title="Edit Product" style="background-color: aqua;" class = "btn btn-default btn-sm"
                 onclick = "openPopup('products',${productId})" ><span class="glyphicon glyphicon-pencil"></span></button>`;
                 var buttonREMOVE_PRODUCT = `<button type="button" data-toggle="tooltip" title="Remove Product" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
-                onclick = "removeEntitesPopup('products',${productId})"> <span class="glyphicon glyphicon-trash"></span></button>`;
+                onclick = "removeEntitesPopup('remove-product-overlay',${productId})"> <span class = "glyphicon glyphicon-trash"> </span></button> `;
 
                 // var buttonSHOW_PRODUCT = ` | <button type="button" onclick="showChange('products',${productId})">Show</button>`;
 
@@ -317,14 +317,16 @@ function extractInLUIS(phrase) {
                 console.log(objKeyMessage);
                 if (index === 0) {
                     document.getElementById("keywords").innerHTML += "<i>score : " + score + "</i>" + "\n";
+                    document.getElementById("keywords").innerHTML += "<u>name</u>" + "\t" + "<u>status</u>" + "\t" + "<u>action</u>" + "\t" + "\n";
                 }
                 highlightTextInsideDiv(keyMessages);
 
                 var productId = objJSON['keymessages'].length - 1;
                 var buttonEDIT_KEYMESSAGE = `<button type="button" onclick="openPopup('keymessages',${productId})">Edit</button>`;
-                var buttonSHOW_KEYMESSAGE = ` | <button type="button" onclick="showChange('keymessages',${productId})">Show</button>`;
+                var buttonREMOVE_PRODUCT = `<button type="button" data-toggle="tooltip" title="Remove Product" style="background-color: #ff6464c2;" class="btn btn-default btn-sm"
+                onclick = "removeEntitesPopup('remove-keymessage-overlay',${productId})"> <span class = "glyphicon glyphicon-trash"></span></button> `;
 
-                document.getElementById("keywords").innerHTML += keyMessages + "\t" + buttonOK + buttonEDIT_KEYMESSAGE + "\n";
+                document.getElementById("keywords").innerHTML += keyMessages + "\t" + "\t" + buttonREMOVE_PRODUCT + "\n";
                 document.getElementById('keywordsM').style.display = 'block';
             });
             /*#########################KEY MESSAGES#########################*/
@@ -354,7 +356,7 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
-                document.getElementById("followup").innerHTML += "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById("followup").innerHTML += "\t" + "<br />";
                 document.getElementById('followupM').style.display = 'block';
             });
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.daterange")
@@ -380,7 +382,7 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
-                document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById("followup").innerHTML += followup + "\t" + "<br />";
                 document.getElementById('followupM').style.display = 'block';
             });
             var objFollowUps = findObjectByKey(token.entities, "type", "builtin.datetimeV2.date")
@@ -406,7 +408,7 @@ function extractInLUIS(phrase) {
                 var buttonEDIT_FOLLOWUP = `<button type="button" onclick="openPopup('followups',${productId})">Edit</button>`;
                 var buttonSHOW_FOLLOWUP = ` | <button type="button" onclick="showChange('followups',${productId})">Show</button>`;
 
-                document.getElementById("followup").innerHTML += followup + "\t" + buttonOK + buttonEDIT_FOLLOWUP + "<br />";
+                document.getElementById("followup").innerHTML += followup + "\t" + "<br />";
                 document.getElementById('followupM').style.display = 'block';
             });
             /*##########################FOLLOW UPS##########################*/
@@ -512,10 +514,21 @@ function openPopup(a_type, a_id, ) {
 
     document.getElementById("change").innerHTML = current_value;
 }
+
+function closeAllPopups() {
+    el = document.getElementById('add-product-overlay');
+    el.style.visibility = "hidden";
+    el = document.getElementById('add-keymessage-overlay');
+    el.style.visibility = "hidden";
+    el = document.getElementById('remove-product-overlay');
+    el.style.visibility = "hidden";
+    el = document.getElementById('remove-keymessage-overlay');
+    el.style.visibility = "hidden";
+}
+
 // To open Add Popup  
 function addEntitesPopup(a_type) {
-    closePopup('add-product-overlay');
-    closePopup('add-keymessage-overlay');
+    closeAllPopups();
 
     type = a_type;
 
@@ -524,21 +537,32 @@ function addEntitesPopup(a_type) {
 }
 // To open Remove Popup  
 function removeEntitesPopup(a_type, a_id) {
+    closeAllPopups();
 
-    type = a_type;
+    if (a_type == 'remove-product-overlay') {
+        type = 'products';
+    } else {
+        type = 'keymessages';
+    }
     id = a_id;
 
-    el = document.getElementById("remove-overlay");
+    el = document.getElementById(a_type);
     el.style.visibility = "visible";
 
-    let current_value = '';
+    var current_value = '';
     if (objNote['entities'][type][id]["after"]) {
         current_value = objNote['entities'][type][id]["after"];
     } else {
         current_value = objNote['entities'][type][id]["before"];
     }
 
-    document.getElementById("remove-change").innerHTML = current_value;
+    if (a_type == 'remove-product-overlay') {
+        document.getElementById("remove-product-change").innerHTML = current_value;
+
+    } else {
+        document.getElementById("remove-keymessage-change").innerHTML = current_value;
+    }
+
 }
 
 // To close Edit Popup  
@@ -580,20 +604,21 @@ function addChanges(p_type) {
 
         if (p_type === 'products') {
             var input = document.getElementById("add-result");
+            let input_value = input.value.toLowerCase();
+            newObj['after'] = input_value;
 
-            newObj['after'] = input.value;
-
-            document.getElementById("productName").innerHTML += input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+            document.getElementById("productName").innerHTML += input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
 
         } else {
             var select = document.getElementById("select-keymessage-result");
 
             var input = document.getElementById("add-keymessage-result");
+            let input_value = input.value.toLowerCase();
 
             newObj['phrase_id'] = select.value;
-            newObj['after'] = input.value;
+            newObj['after'] = input_value;
 
-            document.getElementById("keywords").innerHTML += select.options[select.selectedIndex].text + ' >> ' + input.value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+            document.getElementById("keywords").innerHTML += select.options[select.selectedIndex].text + ' >> ' + input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
         }
 
         objNote['entities'][p_type].push(newObj);
@@ -613,17 +638,27 @@ function addChanges(p_type) {
 }
 
 // To save changes in objJSON          
-function removeChanges() {
-    if (type != '' || id != '') {
+function removeChanges(p_type) {
+    if (p_type != '') {
 
-        var value = document.getElementById("remove-change").innerHTML;
+        if (type != '' || id != '') {
 
-        objNote['entities'][type][id]["is_approve"] = false;
-        objNote['entities'][type][id]["status"] = "pending for moderator approval";
 
-        document.getElementById("productName").innerHTML += value + "\t" + '<span style="background-color: #ff64647a;">Removed</span>' + "\t";
+            objNote['entities'][type][id]["is_approve"] = false;
+            objNote['entities'][type][id]["status"] = "pending for moderator approval";
 
-        closePopup('remove-overlay');
+            if (p_type === 'products') {
+                var value = document.getElementById("remove-product-change").innerHTML;
+                document.getElementById("productName").innerHTML += value + "\t" + '<span style="background-color: #ff64647a;">Removed</span>' + "\t";
+
+            } else {
+                var value = document.getElementById("remove-keymessage-change").innerHTML;
+                document.getElementById("keywords").innerHTML += value + "\t" + '<span style="background-color: #ff64647a;">Removed</span>' + "\t";
+            }
+
+            closePopup('remove-product-overlay');
+            closePopup('remove-keymessage-overlay');
+        }
     }
 }
 
