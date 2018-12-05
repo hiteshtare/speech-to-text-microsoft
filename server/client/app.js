@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("keywords").innerHTML = "";
         document.getElementById("followup").innerHTML = "";
 
+        document.getElementById("entities").style.display = "none";
         document.getElementById("product").style.display = "none";
         document.getElementById('keywordsM').style.display = 'none';
         document.getElementById('followupM').style.display = 'none';
@@ -190,8 +191,8 @@ function OnComplete() {
     editBtn.disabled = false;
 
     //Testing
-    phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
-    and also its side effects or any efficacy study by today or tomorrow or Sunday`;
+    // phraseDiv.innerHTML = `Would you please provide with the details about Plavix or Xarelto, 
+    // and also its side effects or any efficacy study by today or tomorrow or Sunday`;
 
     if (phraseDiv.innerHTML) {
 
@@ -202,7 +203,7 @@ function OnComplete() {
         phraseTextArea.value = phraseDiv.innerHTML;
 
         //Testing
-        submitToLUIS();
+        //submitToLUIS();
     }
 }
 
@@ -244,6 +245,7 @@ function extractInLUIS(phrase) {
         console.log(`token.entities.length`);
         console.log(token.entities.length);
         if (token.entities.length > 0) {
+            document.getElementById("entities").style.display = "block";
             document.getElementById("product").style.display = "block";
             document.getElementById('keywordsM').style.display = "block";
 
@@ -425,9 +427,10 @@ function extractInLUIS(phrase) {
         } else {
             objJSON = {};
 
+            document.getElementById("entities").style.display = "block";
             document.getElementById("product").style.display = "block";
             document.getElementById('keywordsM').style.display = "block";
-            document.getElementById('followupM').style.display = 'none';
+            document.getElementById('followupM').style.display = 'block';
 
             document.getElementById('dvSave').style.display = "block";
             document.getElementById('dvCancel').style.display = "block";
@@ -673,6 +676,7 @@ function submitToLUIS() {
     document.getElementById("keywords").innerHTML = "";
     document.getElementById("followup").innerHTML = "";
 
+    document.getElementById("entities").style.display = "none";
     document.getElementById("product").style.display = "none";
     document.getElementById('keywordsM').style.display = 'none';
     document.getElementById('followupM').style.display = 'none';
@@ -697,49 +701,6 @@ function saveResult() {
     document.getElementById("phraseTextArea").style.display = 'block';
 
     editBtn.disabled = true;
-
-    // var objNote = {
-    //     "machine_transcript": "Would you please provide with the details about Plavix or Xarelto, and also its side effects or any efficacy study by today or tomorrow or Sunday",
-    //     "transcripts": [{
-    //             "before": "plastics",
-    //             "after": "plavix"
-    //         },
-    //         {
-    //             "before": "lyrics",
-    //             "after": "clinic"
-    //         }
-    //     ],
-    //     "is_transcript_approve": "false",
-    //     "entities": {
-    //         "products": [{
-    //                 "before": "plastics",
-    //                 "after": "plavix"
-    //             },
-    //             {
-    //                 "before": "lyrics",
-    //                 "after": "clinic"
-    //             }
-    //         ],
-    //         "keymessages": [{
-    //                 "before": "effects",
-    //                 "after": "efficacy"
-    //             },
-    //             {
-    //                 "before": "care",
-    //                 "after": "cure"
-    //             }
-    //         ],
-    //         "followups": [{
-    //                 "before": "Tuesday",
-    //                 "after": "Thursday"
-    //             },
-    //             {
-    //                 "before": "7 Sunday",
-    //                 "after": "7th of Sunday"
-    //             }
-    //         ]
-    //     }
-    // };
 
     var xhr = new XMLHttpRequest();
     var url = "http://localhost:5000/notes";
@@ -785,6 +746,7 @@ function clearResult() {
     document.getElementById("keywords").innerHTML = "";
     document.getElementById("followup").innerHTML = "";
 
+    document.getElementById("entities").style.display = "none";
     document.getElementById("product").style.display = "none";
     document.getElementById('keywordsM').style.display = 'none';
     document.getElementById('followupM').style.display = 'none';

@@ -4,6 +4,12 @@
   display: block;
 }
 
+.feature-title-approver {
+  font-size: 20px;
+  margin-top: 10px;
+  display: block;
+}
+
 .content-section.introduction {
   background-image: linear-gradient(to left, #2bc0ec, #1b81d7);
   color: #fff;
