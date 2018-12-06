@@ -214,8 +214,8 @@ function extractInLUIS(phrase) {
 
     //Luis Configurtion
     var luis_config = {
-        appId: '00f2c5cb-7861-4b1e-9378-3b53859f4a1e', // call_notes_poc_v1
-        //appId: '723bdb51-386b-4eed-91e6-36d25739b1ac', // ES_call_notes_poc_v1
+        // appId: '00f2c5cb-7861-4b1e-9378-3b53859f4a1e', // call_notes_poc_v1
+        appId: '3deeb38f-f5ef-4a85-aae3-353b17c4d1b0', //new_call_notes_poc_v1
         versionId: '0.1',
         subscriptionKey: '10ddb0b870ea4e7fb06245e99559c248'
     }
@@ -280,7 +280,7 @@ function extractInLUIS(phrase) {
                 console.log(objProduct);
 
                 if (index === 0) {
-                    document.getElementById("productName").innerHTML += "<i>score : " + score + "</i>" + "\n";
+                    // document.getElementById("productName").innerHTML += "<i>score : " + score + "</i>" + "\n";
                     document.getElementById("productName").innerHTML += "<u>name</u>" + "\t" + "<u>status</u>" + "\t" + "<u>action</u>" + "\t" + "\n";
                 }
                 highlightTextInsideDiv(productName);
@@ -318,7 +318,7 @@ function extractInLUIS(phrase) {
                 console.log(`objKeyMessage`);
                 console.log(objKeyMessage);
                 if (index === 0) {
-                    document.getElementById("keywords").innerHTML += "<i>score : " + score + "</i>" + "\n";
+                    // document.getElementById("keywords").innerHTML += "<i>score : " + score + "</i>" + "\n";
                     document.getElementById("keywords").innerHTML += "<u>name</u>" + "\t" + "<u>status</u>" + "\t" + "<u>action</u>" + "\t" + "\n";
                 }
                 highlightTextInsideDiv(keyMessages);
@@ -615,17 +615,17 @@ function addChanges(p_type) {
             document.getElementById("productName").innerHTML += input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
 
         } else {
-            var select = document.getElementById("select-keymessage-result");
+            // var select = document.getElementById("select-keymessage-result");
 
             var input = document.getElementById("add-keymessage-result");
             let input_value = input.value.toLowerCase();
             if (input_value === "")
                 return;
 
-            newObj['phrase_id'] = select.value;
+            // newObj['phrase_id'] = select.value;
             newObj['after'] = input_value;
 
-            document.getElementById("keywords").innerHTML += select.options[select.selectedIndex].text + ' >> ' + input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
+            document.getElementById("keywords").innerHTML += input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
         }
 
         objNote['entities'][p_type].push(newObj);

@@ -36,7 +36,6 @@ var noteSchema = new Schema({
         value: false
       },
       status: String,
-      phrase_id: String,
     }],
     followups: [{
       before: String,

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Note = require("../models/noteModel");
-const request = require("request-promise")
+const request = require("request-promise");
+const _ = require("lodash");
 
 var config = require('../../config');
 
@@ -156,62 +157,42 @@ exports.notes_deletes_note = async (req, res, next) => {
   }
 };
 
-//GET Request for fetching PhraseList associated with id (1460088) for Brands
-async function getPhraseArrayFromPhraseListById(p_phrase) {
+//GET Request for fetching Closed List Entity By Model Id
+async function getClosedListEntityByModel(p_model) {
   const get_options = {
     method: 'GET',
-    uri: `${luis_wepApiUri}/phraselists/${p_phrase.id}`,
+    uri: `${luis_wepApiUri}/closedlists/${p_model.id}`,
     headers: luis_wepApiHeaders
   };
 
-  const brand_PhraseList = await request(get_options)
+  const closedListEntity = await request(get_options)
     .then(function (resp) {
-      console.log(`GET - Phrase Array fetched for ${p_phrase.name}`);
+      console.log(`GET - Closed List Entity fetched for ${p_model.name}`);
       let json_resp = JSON.parse(resp);
-      return json_resp["phrases"];
+      return json_resp["subLists"];
     });
 
-  return brand_PhraseList;
+  return closedListEntity;
 }
 
-//PUT Request for updating the string inside PhraseList associated with id (1460088) for Brands
-async function updateBrandsFromPhraseListById(p_phrase) {
+//PUT Request for updating Closed List Entity By Model Id
+async function updateClosedListEntityByModel(p_model, p_closedListEntity) {
   const put_options = {
     method: 'PUT',
-    uri: `${luis_wepApiUri}/phraselists/${p_phrase.id}`,
+    uri: `${luis_wepApiUri}/closedlists/${p_model.id}`,
     headers: luis_wepApiHeaders,
     body: {
-      "id": +`${p_phrase.id}`,
-      "name": `${p_phrase.name}`,
-      "phrases": `${p_phrase.phrases}`,
-      "isExchangeable": true,
-      "isActive": true
+      "name": p_model.name,
+      "subLists": p_closedListEntity,
+      "roles": []
     },
     json: true
   };
 
   await request(put_options)
     .then(async function (resp) {
-      console.log(`PUT - Phrase Array updated for ${p_phrase.name}`);
+      console.log(`PUT - Closed List Entity updated for ${p_model.name}`);
     });
-}
-
-//GET Request for fetching PhraseList
-async function getPhraseArrayFromPhraseList() {
-  const get_options = {
-    method: 'GET',
-    uri: `${luis_wepApiUri}/phraselists?skip=0&take=100`,
-    headers: luis_wepApiHeaders
-  };
-
-  const brand_PhraseList = await request(get_options)
-    .then(function (resp) {
-      console.log(`GET - Phrase Array fetched for All`);
-      let json_resp = JSON.parse(resp);
-      return json_resp;
-    });
-
-  return brand_PhraseList;
 }
 
 //POST Request for training luis application
@@ -230,7 +211,7 @@ async function trainLuisApp() {
     });
 }
 
-
+// To train products 
 async function productsTraining() {
   let arr_notes = await Note.find({ // Array of Notes
     'entities.products': {
@@ -251,60 +232,51 @@ async function productsTraining() {
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
     console.log('MONGO - No Products for Training');
-    // res.status(200).json({
-    //   success: true,
-    //   message: "No data found for LUIS trainig"
-    // });
     return;
   }
 
   //Else proceed further
   console.log(`MONGO - ${arr_notes.length} Products fetched for Training`);
 
-  /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
-  let phrase = {
-    id: '1460088',
+  /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
+  let model_brand = {
+    id: '0236cbdd-4d36-4b89-8bfd-a57f935d5dd4',
     name: 'brand',
-    phrases: '',
     has_change: false
   };
 
-  let brand_PhraseList = await getPhraseArrayFromPhraseListById(phrase);
-  /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
+  let closedListEntity_brand = await getClosedListEntityByModel(model_brand);
+  console.log(`COUNT - ${closedListEntity_brand.length} Closed List Entity for ${model_brand.name}`);
+  /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
 
   //Iterate over each note
   arr_notes.forEach((note) => {
     arr_products = note["entities"]["products"]; // Initialise Array of Products
 
     //Iterate over each product inside entities
-    arr_products.forEach((product, index) => {
-      if (index == 0) {
-        console.log(`${phrase.name}`);
-      }
-      //Replace 'before' sub-string inside string with empty
-      //Concatinate the string with 'after' sub-string
-      if (product["before"] != null && product["after"] != null) { //For Updation
-        brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
-        brand_PhraseList += ',' + product["after"];
-        console.log(`Updated : From ${product["before"]} to ${product["after"]}`);
-      } else if (product["before"] != null && product["after"] == null) { //For Removal
-        brand_PhraseList = brand_PhraseList.replace(`,${product["before"]}`, '');
+    arr_products.forEach((product) => {
+      if (product["before"] != null && product["after"] == null) { //For Removal
+        _.remove(closedListEntity_brand, {
+          canonicalForm: product["before"]
+        });
         console.log(`Removed : ${product["before"]}`);
       } else if (product["before"] == null && product["after"] != null) { //For Addition
-        brand_PhraseList += ',' + product["after"];
+        closedListEntity_brand.push({
+          "canonicalForm": product["after"],
+          "list": []
+        });
         console.log(`Added : ${product["after"]}`);
       }
 
-      phrase.has_change = true;
+      model_brand.has_change = true;
     }); //End of arr_products.forEach
   }); //End of arr_notes.forEach
 
-  /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
-  if (phrase.has_change) {
-    phrase['phrases'] = brand_PhraseList;
-    await updateBrandsFromPhraseListById(phrase);
+  /**********************UPDATE FOR CLOSE LIST ENTITY ARRAY**********************/
+  if (model_brand.has_change) {
+    await updateClosedListEntityByModel(model_brand, closedListEntity_brand);
   }
-  /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
+  /**********************UPDATE FOR CLOSE LIST ENTITY ARRAY**********************/
 
   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
   console.log('MONGO - Updating status of Products Trained');
@@ -355,63 +327,50 @@ async function keyMessagesTraining() {
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
     console.log('MONGO - No Key Messages for Training');
-    // res.status(200).json({
-    //   success: true,
-    //   message: "No data found for LUIS trainig"
-    // });
     return;
   }
 
   //Else proceed further
   console.log(`MONGO - ${arr_notes.length} Key Messages fetched for Training`);
 
-  /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
-  var arr_allPhraseList = await getPhraseArrayFromPhraseList();
-  /**********************GET FOR PHRASE LIST FEATURE ARRAY**********************/
+  /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
+  let model_keymessage = {
+    id: '9f4ff2a5-edd0-4386-8f54-490941b6d0b1',
+    name: 'keymessages',
+    has_change: false
+  };
+
+  let closedListEntity_keymessage = await getClosedListEntityByModel(model_keymessage);
+  console.log(`COUNT - ${closedListEntity_keymessage.length} Closed List Entity for ${model_keymessage.name}`);
+  /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
 
   //Iterate over each note
   arr_notes.forEach((note) => {
-    arr_keymessages = note["entities"]["keymessages"]; // Initialise Array of Products
-
+    arr_keymessages = note["entities"]["keymessages"]; // Initialise Array of Key Messages
     //Iterate over each keymessage inside entities
-    arr_keymessages.forEach((keymessage, index) => {
-      //Iterate over each phrase inside phrase array
-      arr_allPhraseList.forEach((phrase, p_index) => {
-        phrase['has_change'] = false;
-        if (phrase['id'] == keymessage['phrase_id']) {
-          console.log(`PHRASE - ${phrase['name']} updated.`);
+    arr_keymessages.forEach((keymessage) => {
+      if (keymessage["before"] != null && keymessage["after"] == null) { //For Removal
+        _.remove(closedListEntity_keymessage, {
+          canonicalForm: keymessage["before"]
+        });
+        console.log(`Removed : ${keymessage["before"]}`);
+      } else if (keymessage["before"] == null && keymessage["after"] != null) { //For Addition
+        closedListEntity_keymessage.push({
+          "canonicalForm": keymessage["after"],
+          "list": []
+        });
+        console.log(`Added : ${keymessage["after"]}`);
+      }
 
-          current_PhraseList = phrase['phrases'];
-
-          //Replace 'before' sub-string inside string with empty
-          //Concatinate the string with 'after' sub-string
-          if (keymessage["before"] != null && keymessage["after"] != null) { //For Updation
-            current_PhraseList = current_PhraseList.replace(`,${keymessage["before"]}`, '');
-            current_PhraseList += ',' + keymessage["after"];
-            console.log(`Updated : From ${keymessage["before"]} to ${keymessage["after"]}`);
-          } else if (keymessage["before"] != null && keymessage["after"] == null) { //For Removal
-            current_PhraseList = current_PhraseList.replace(`,${keymessage["before"]}`, '');
-            console.log(`Removed : ${keymessage["before"]}`);
-          } else if (keymessage["before"] == null && keymessage["after"] != null) { //For Addition
-            current_PhraseList += ',' + keymessage["after"];
-            console.log(`Added : ${keymessage["after"]}`);
-          }
-
-          arr_allPhraseList[p_index]['phrases'] = current_PhraseList;
-          phrase['has_change'] = true;
-        } //End of if
-      }); //End of arr_allPhraseList.forEach
+      model_keymessage.has_change = true;
     }); //End of arr_keymessages.forEach
   }); //End of arr_notes.forEach
 
-  /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
-  arr_allPhraseList.forEach(async (phrase, p_index) => {
-    if (phrase['has_change']) {
-      console.log(`${phrase['name']} has changed`)
-      await updateBrandsFromPhraseListById(phrase);
-    }
-  });
-  /**********************UPDATE FOR PHRASE LIST FEATURE ARRAY**********************/
+  /**********************UPDATE FOR CLOSE LIST ENTITY ARRAY**********************/
+  if (model_keymessage.has_change) {
+    await updateClosedListEntityByModel(model_keymessage, closedListEntity_keymessage);
+  }
+  /**********************UPDATE FOR CLOSE LIST ENTITY ARRAY**********************/
 
   /*#####################UPDATING STATUS OF PRODUCT LIST#####################*/
   console.log('MONGO - Updating status of Key Messages Trained');
