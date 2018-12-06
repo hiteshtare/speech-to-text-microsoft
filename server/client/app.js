@@ -604,10 +604,12 @@ function addChanges(p_type) {
             'status': "pending for moderator approval"
         };
         var buttonREMOVE_PRODUCT = ``;
-
         if (p_type === 'products') {
             var input = document.getElementById("add-result");
             let input_value = input.value.toLowerCase();
+            if (input_value === "")
+                return;
+
             newObj['after'] = input_value;
 
             document.getElementById("productName").innerHTML += input_value + "\t" + '<span style="background-color: springgreen;">Added</span>' + "\t" + buttonREMOVE_PRODUCT + "\n";
@@ -617,6 +619,8 @@ function addChanges(p_type) {
 
             var input = document.getElementById("add-keymessage-result");
             let input_value = input.value.toLowerCase();
+            if (input_value === "")
+                return;
 
             newObj['phrase_id'] = select.value;
             newObj['after'] = input_value;
