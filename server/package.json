@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo 'Node note app'",
-    "start": "node server",
+    "start": "node server.js",
     "heroku-prebuild": "echo This runs before Heroku installs your dependencies.",
     "heroku-postbuild": "echo This runs afterwards."
   },
