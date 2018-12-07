@@ -214,16 +214,15 @@ async function trainLuisApp() {
 // To train products 
 async function productsTraining() {
   let arr_notes = await Note.find({ // Array of Notes
-    'entities.products': {
-      $elemMatch: {
-        'is_approve': true,
-        'status': 'pending for luis training'
-      }
-    }
-  }, {
-    "entities.products.$": 1
-  }, {
-    lean: true
+    'entities.products.is_approve': true,
+    'entities.products.status': 'pending for luis training'
+  }).then((docs) => {
+    docs.forEach(function (doc) {
+      doc.entities["products"] = doc.entities["products"].filter(function (product) {
+        return product.is_approve == true && product.status == 'pending for luis training';
+      });
+    })
+    return docs;
   });
 
   var arr_products; // Array of Products
@@ -231,12 +230,12 @@ async function productsTraining() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Products for Training');
+    console.log('MONGO - No Notes for Training');
     return;
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Products fetched for Training`);
+  console.log(`MONGO - ${arr_notes.length} Notes fetched for Training`);
 
   /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
   let model_brand = {
@@ -254,7 +253,11 @@ async function productsTraining() {
     arr_products = note["entities"]["products"]; // Initialise Array of Products
 
     //Iterate over each product inside entities
-    arr_products.forEach((product) => {
+    arr_products.forEach((product, index) => {
+      if (index == 0) {
+        console.log(`LUIS - ${arr_products.length} Products are added for Training`);
+      }
+
       if (product["before"] != null && product["after"] == null) { //For Removal
         _.remove(closedListEntity_brand, {
           canonicalForm: product["before"]
@@ -286,7 +289,7 @@ async function productsTraining() {
 
     arr_products.forEach(async (product, index) => {
       if (index == 0) {
-        console.log(`Updating arr_products`);
+        console.log(`MONGO - ${arr_products.length} Products are updated`);
       }
 
       const id = product["_id"];
@@ -309,16 +312,15 @@ async function productsTraining() {
 
 async function keyMessagesTraining() {
   let arr_notes = await Note.find({ // Array of Notes
-    'entities.keymessages': {
-      $elemMatch: {
-        'is_approve': true,
-        'status': 'pending for luis training'
-      }
-    }
-  }, {
-    "entities.keymessages.$": 1
-  }, {
-    lean: true
+    'entities.keymessages.is_approve': true,
+    'entities.keymessages.status': 'pending for luis training'
+  }).then((docs) => {
+    docs.forEach(function (doc) {
+      doc.entities["keymessages"] = doc.entities["keymessages"].filter(function (keymessage) {
+        return keymessage.is_approve == true && keymessage.status == 'pending for luis training';
+      });
+    })
+    return docs;
   });
 
   var arr_keymessages; // Array of KeyMessages
@@ -326,12 +328,12 @@ async function keyMessagesTraining() {
 
   //To check if Array of Notes is empty then return with 'No data found' message
   if (arr_notes.length == 0) {
-    console.log('MONGO - No Key Messages for Training');
+    console.log('MONGO - No Notes for Training');
     return;
   }
 
   //Else proceed further
-  console.log(`MONGO - ${arr_notes.length} Key Messages fetched for Training`);
+  console.log(`MONGO - ${arr_notes.length} Notes fetched for Training`);
 
   /**********************GET FOR CLOSE LIST ENTITY ARRAY**********************/
   let model_keymessage = {
@@ -348,7 +350,11 @@ async function keyMessagesTraining() {
   arr_notes.forEach((note) => {
     arr_keymessages = note["entities"]["keymessages"]; // Initialise Array of Key Messages
     //Iterate over each keymessage inside entities
-    arr_keymessages.forEach((keymessage) => {
+    arr_keymessages.forEach((keymessage, index) => {
+      if (index == 0) {
+        console.log(`LUIS - ${arr_keymessages.length} Key Messages are added for Training`);
+      }
+
       if (keymessage["before"] != null && keymessage["after"] == null) { //For Removal
         _.remove(closedListEntity_keymessage, {
           canonicalForm: keymessage["before"]
@@ -380,7 +386,7 @@ async function keyMessagesTraining() {
 
     arr_keymessages.forEach(async (product, index) => {
       if (index == 0) {
-        console.log(`Updating arr_keymessages`);
+        console.log(`LUIS - ${arr_keymessages.length} Key Messages are updated`);
       }
 
       const id = product["_id"];
@@ -405,10 +411,12 @@ async function keyMessagesTraining() {
 exports.train_luis_for_entities = async (req, res, next) => {
   ///////////////////////////PRODUCTS///////////////////////////
   try {
+
+    console.log('-----------------ProductsTraining-----------------');
     await productsTraining();
-
+    console.log('-----------------KeyMessagesTraining-----------------');
     await keyMessagesTraining();
-
+    console.log('-----------------TrainLuisApp-----------------');
     await trainLuisApp();
 
     res.status(200).json({
@@ -427,16 +435,15 @@ exports.train_luis_for_entities = async (req, res, next) => {
 async function productsPublishing() {
   ///////////////////////////PRODUCTS///////////////////////////
   let arr_notes = await Note.find({ // Array of Notes
-    'entities.products': {
-      $elemMatch: {
-        'is_approve': true,
-        'status': 'completed luis training'
-      }
-    }
-  }, {
-    "entities.products.$": 1
-  }, {
-    lean: true
+    'entities.products.is_approve': true,
+    'entities.products.status': 'completed luis training'
+  }).then((docs) => {
+    docs.forEach(function (doc) {
+      doc.entities["products"] = doc.entities["products"].filter(function (product) {
+        return product.is_approve == true && product.status == 'completed luis training';
+      });
+    })
+    return docs;
   });
 
   var arr_products; // Array of Products
@@ -459,7 +466,7 @@ async function productsPublishing() {
 
     arr_products.forEach(async (product, index) => {
       if (index == 0) {
-        console.log(`Updating arr_products`);
+        console.log(`LUIS - ${arr_products.length} Products are updated`);
       }
 
       const id = product["_id"];
@@ -484,16 +491,15 @@ async function productsPublishing() {
 async function keyMessagesPublishing() {
   ///////////////////////////PRODUCTS///////////////////////////
   let arr_notes = await Note.find({ // Array of Notes
-    'entities.keymessages': {
-      $elemMatch: {
-        'is_approve': true,
-        'status': 'completed luis training'
-      }
-    }
-  }, {
-    "entities.keymessages.$": 1
-  }, {
-    lean: true
+    'entities.keymessages.is_approve': true,
+    'entities.keymessages.status': 'completed luis training'
+  }).then((docs) => {
+    docs.forEach(function (doc) {
+      doc.entities["keymessages"] = doc.entities["keymessages"].filter(function (keymessage) {
+        return keymessage.is_approve == true && keymessage.status == 'completed luis training';
+      });
+    })
+    return docs;
   });
 
   var arr_keymessages; // Array of keymessages
@@ -516,7 +522,7 @@ async function keyMessagesPublishing() {
 
     arr_keymessages.forEach(async (product, index) => {
       if (index == 0) {
-        console.log(`Updating arr_keymessages`);
+        console.log(`LUIS - ${arr_keymessages.length} Key Messages are updated`);
       }
 
       const id = product["_id"];
@@ -542,10 +548,11 @@ async function keyMessagesPublishing() {
 exports.publish_changes_for_luis = async (req, res, next) => {
   try {
 
+    console.log('+++++++++++++++++ProductsPublishing+++++++++++++++++');
     await productsPublishing();
-
+    console.log('+++++++++++++++++KeyMessagesPublishing+++++++++++++++++');
     await keyMessagesPublishing();
-
+    console.log('+++++++++++++++++PublishingChanges+++++++++++++++++');
     /**********************POST FOR TRAIN APPLICATION VERSION**********************/
     const post_options = {
       method: 'POST',
