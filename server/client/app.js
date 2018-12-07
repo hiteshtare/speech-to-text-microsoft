@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
         startBtn.disabled = false;
     });
 
-    bindKeyMessageSelect();
+    //bindKeyMessageSelect();
 });
 
 function Setup() {
