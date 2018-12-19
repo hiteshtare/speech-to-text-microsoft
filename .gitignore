@@ -8,4 +8,4 @@ distrib/*
 /samples/**/package-lock.json
 .idea/
 
-server/public/*
+# server/public/*

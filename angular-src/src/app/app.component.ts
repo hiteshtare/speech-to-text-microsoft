@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 export class AppComponent {
   title = 'Moderator Screen';
 
-  constructor(private noteApiService: NoteApiService, private customToastService: CustomToastService) {
+  constructor(public noteApiService: NoteApiService, private customToastService: CustomToastService) {
     this.noteApiService.notesApiUrl = environment.apiUrl;
   }
 }

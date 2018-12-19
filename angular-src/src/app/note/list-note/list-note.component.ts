@@ -17,7 +17,7 @@ export class ListNoteComponent implements OnInit {
   display = false;
   form;
 
-  constructor(private noteApiService: NoteApiService, private customToastService: CustomToastService) {
+  constructor(public noteApiService: NoteApiService, private customToastService: CustomToastService) {
   }
 
 
